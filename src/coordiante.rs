@@ -1,4 +1,6 @@
-#[derive(Debug,Clone,Copy)]
+#[derive(Debug,Clone,Copy, Hash, PartialEq)]
+
+#[derive(Eq)]
 pub struct Coordinate {
     pub x: u16,
     pub y: u16,

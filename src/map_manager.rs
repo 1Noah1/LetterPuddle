@@ -1,5 +1,4 @@
-use std::io::{Write, stdout};
-use std::time::Duration;
+use std::collections::HashMap;
 
 use crate::map::Map;
 use crate::coordiante::Coordinate;
@@ -7,12 +6,12 @@ use crate::dimensions::Dimensions;
 use crate::letter_type::LetterType;
 use crate::pixel::Pixel;
 
-use termion::{cursor, screen::AlternateScreen, terminal_size};
+use termion::cursor;
 pub struct MapManager {
     pub map: Map,
     terminal_dimensions: Dimensions,
     last_written_pos: Vec<Coordinate>,
-    border_pos: Vec<Coordinate>
+    border_pos: HashMap<Coordinate, LetterType>
 
 }
 impl MapManager {
@@ -26,7 +25,7 @@ impl MapManager {
                 };
         Self {
             last_written_pos: vec![],
-            border_pos: vec![],
+            border_pos: HashMap::new(),
             terminal_dimensions: terminal_dimensions,
             map: Map::new(terminal_dimensions)
         }
@@ -53,7 +52,7 @@ impl MapManager {
             let mut coords_to_check: Vec<Coordinate> = vec![];
             self.last_written_pos.iter().for_each(
                 |p| {
-                coords_to_check.push(p.clone());
+                    coords_to_check.push(p.clone());
                 }
             );
             let mut i = 0;
@@ -64,6 +63,8 @@ impl MapManager {
             for coord in coords_to_check {
                 self.check_surrounding_letters(coord);
             }
+        }else{
+            self.write_middle_letter('A');
         }
     }
 
@@ -95,11 +96,8 @@ impl MapManager {
                 ));
             i += 1;
         }
-        println!("bottom :3 count :{}", i);
-
         i = 0;
 
-        println!("left");
         //left border
         while i <= self.map.vec.len() -1 {
             self.writer(Pixel::new(
@@ -112,7 +110,6 @@ impl MapManager {
 
 
         i = 0;
-        println!("right");
         //right border 
         while i <= self.map.vec.len() -1 {
             self.writer(Pixel::new(
@@ -132,37 +129,44 @@ impl MapManager {
     fn check_surrounding_letters(&mut self, coords: Coordinate) {
 
         if self.map.vec[coords.x as usize][coords.y as usize].char == ' ' {
-        let mut offset: i32 = -1; 
-        let mut i = 0;
-        let mut surrounding_letters: Vec<char> = vec![];
-        //  if the center letter is already in a corner, i will go out of bounds!!
-        /* 
-        while i < 4 {
-            // horizontal letters                   this prevents going out of bounds
-            if i < 2 && (coords.x != 0 || coords.x != (self.map.vec.len() as u16 -1)){
-                surrounding_letters.push(
-                 self.map.vec[coords.x as usize + offset as usize][coords.y as usize].char
-                );
+            let mut offset: i32 = -1; 
+            let mut i = 0;
+            let mut surrounding_letters: Vec<char> = vec![];
 
+            //  if the center letter is already in a corner, i will go out of bounds!!
+            while i < 4 {
+                // horizontal letters                   this prevents going out of bounds
+                if i < 2 {
+                match self.border_pos.get(&Coordinate{x: coords.x +  offset as u16, y: coords.y}) {
+                    None =>  {
+                        surrounding_letters.push(
+                         self.map.vec[coords.x as usize + offset as usize][coords.y as usize].char
+                        );
+                    }
+                    _ => {/*border hit*/}
+                }
                 // vertical  letters
-            }else if  {
-                surrounding_letters.push(
-                 self.map.vec[coords.x as usize][coords.y as usize  + offset as usize].char
-                );
+                }else {
+                    match self.border_pos.get(&Coordinate{x: coords.x, y: coords.y +  offset as u16}) {
+                        None =>  {
+                            surrounding_letters.push(
+                             self.map.vec[coords.x as usize + offset as usize][coords.y as usize].char
+                            );
+                        }
+                        _ => {/*border hit*/}
+                    }
+                }
+                i += 1;
+                if offset < 1{
+                    offset += 2;
+                }else{
+                    offset = 0;
+                }
             }
-            i += 1;
-            if offset < 1{
-                offset += 2;
-            }else{
-                offset = 0;
-            }
-        }
-*/
-        
 
-        // gather data from sorrounding letters
-        // write them to possibility map
-        // get own letter
+
+            // write them to possibility map
+            // get own letter
         }
         //else {
         // move imaginary cursor left from origin
@@ -179,8 +183,8 @@ impl MapManager {
         self.map.vec[pixel.location.x as usize][pixel.location.y as usize].char = pixel.char;
 
         match pixel.letter_type {
-            LetterType::Border => self.border_pos.push(pixel.location),
-            LetterType::Regular => self.last_written_pos.push(pixel.location),
+            LetterType::Border => {self.border_pos.insert(pixel.location, pixel.letter_type);}
+            LetterType::Regular => self.last_written_pos.push(pixel.location)
         }
     }
 }
