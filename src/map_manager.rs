@@ -37,11 +37,8 @@ impl MapManager {
     }
     pub fn draw_map(map: &Map) {
 
-        /*
-        let mut screen = AlternateScreen::from(stdout());
-        write!(screen, "Writing to alternate screen!").unwrap();
-        screen.flush().unwrap();
-        */
+        print!("{}[2J", 27 as char);
+
         map.vec.iter().for_each(|row| {
             row.iter().for_each(|pixel| {
                 cursor::Goto(pixel.location.x, pixel.location.y);
@@ -53,22 +50,21 @@ impl MapManager {
 
     pub fn grow(&mut self) {
         if self.last_written_pos.len() > 0 {
-        let mut coords_to_check: Vec<Coordinate> = vec![];
-        self.last_written_pos.iter().for_each(
-            |p| {
-            coords_to_check.push(p.clone());
+            let mut coords_to_check: Vec<Coordinate> = vec![];
+            self.last_written_pos.iter().for_each(
+                |p| {
+                coords_to_check.push(p.clone());
+                }
+            );
+            let mut i = 0;
+            while i < self.last_written_pos.len()  {
+                self.last_written_pos.remove(i);
+                i += 1
             }
-        );
-        let mut i = 0;
-        while i < self.last_written_pos.len()  {
-            self.last_written_pos.remove(i);
-            i += 1
+            for coord in coords_to_check {
+                self.check_surrounding_letters(coord);
+            }
         }
-        for coord in coords_to_check {
-            self.check_surrounding_letters(coord);
-        }
-        }
-        println!("no origin to grow from");
     }
 
     fn write_borders(&mut self) {
@@ -101,6 +97,9 @@ impl MapManager {
         }
         println!("bottom :3 count :{}", i);
 
+        i = 0;
+
+        println!("left");
         //left border
         while i <= self.map.vec.len() -1 {
             self.writer(Pixel::new(
@@ -111,10 +110,13 @@ impl MapManager {
             i += 1;
         }
 
+
+        i = 0;
+        println!("right");
         //right border 
         while i <= self.map.vec.len() -1 {
             self.writer(Pixel::new(
-                Coordinate::new(i  as u16, self.map.vec[0].len() as u16),
+                Coordinate::new(i  as u16, (self.map.vec[0].len() -1) as u16),
                 'r',
                  LetterType::Border
                 ));
