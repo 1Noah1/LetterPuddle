@@ -1,4 +1,5 @@
+#[derive(Debug, Clone, Copy)]
 pub enum LetterType {
-    border,
-    regular
+    Border,
+    Regular
 }

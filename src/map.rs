@@ -1,3 +1,4 @@
+use crate::letter_type::LetterType;
 use crate::pixel::Pixel;
 use crate::dimensions::Dimensions;
 use crate::coordiante::Coordinate;
@@ -9,7 +10,7 @@ impl Map {
     pub fn new(dimensions: Dimensions, ) -> Map {
         println!("{:?}", dimensions);
         let mut vec: Vec<Vec<Pixel>> = vec![
-            vec![Pixel::new(Coordinate::new(0, 0), ' '); dimensions.width as usize];
+            vec![Pixel::new(Coordinate::new(0, 0), ' ', LetterType::Regular); dimensions.width as usize];
             dimensions.height as usize
         ];
 

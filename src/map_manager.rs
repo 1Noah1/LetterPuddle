@@ -1,9 +1,13 @@
+use std::io::{Write, stdout};
+use std::time::Duration;
+
 use crate::map::Map;
 use crate::coordiante::Coordinate;
 use crate::dimensions::Dimensions;
 use crate::letter_type::LetterType;
+use crate::pixel::Pixel;
 
-use termion::cursor;
+use termion::{cursor, screen::AlternateScreen, terminal_size};
 pub struct MapManager {
     pub map: Map,
     terminal_dimensions: Dimensions,
@@ -32,6 +36,12 @@ impl MapManager {
         self.write_middle_letter('A')
     }
     pub fn draw_map(map: &Map) {
+
+        /*
+        let mut screen = AlternateScreen::from(stdout());
+        write!(screen, "Writing to alternate screen!").unwrap();
+        screen.flush().unwrap();
+        */
         map.vec.iter().for_each(|row| {
             row.iter().for_each(|pixel| {
                 cursor::Goto(pixel.location.x, pixel.location.y);
@@ -68,42 +78,56 @@ impl MapManager {
         // why?
         // so i can write the border points into an array and know where i can't grow any further
         let mut i = 0;
-        //top border
-        self.map.vec.first_mut().unwrap().iter_mut().for_each(
-            |unit|{
-                unit.char = 't';
-            }
-        );
 
+        //top border
+        while i <= self.map.vec[0].len() -1 {
+            self.writer(Pixel::new(
+                Coordinate::new(0 as u16, i as u16),
+                't',
+                 LetterType::Border
+                ));
+            i += 1;
+        }
+ 
+        i = 0;
         //bottom border
-        self.map.vec.last_mut().unwrap().iter_mut().for_each(
-            |unit|{
-                unit.char = 'b';
-            }
-        );
+        while i <= self.map.vec[0].len() -1 {
+            self.writer(Pixel::new(
+                Coordinate::new((self.map.vec.len() -1)  as u16, i as u16),
+                'b',
+                 LetterType::Border
+                ));
+            i += 1;
+        }
+        println!("bottom :3 count :{}", i);
+
         //left border
-        self.map.vec.iter_mut().for_each(
-            |row|{
-                row.first_mut().unwrap().char = 'l'
-            }
-        );
+        while i <= self.map.vec.len() -1 {
+            self.writer(Pixel::new(
+                Coordinate::new(i  as u16, 0 as u16),
+                'l',
+                 LetterType::Border
+                ));
+            i += 1;
+        }
+
         //right border 
-        self.map.vec.iter_mut().for_each(
-            |row|{
-                row.last_mut().unwrap().char = 'r'
-            }
-        );
+        while i <= self.map.vec.len() -1 {
+            self.writer(Pixel::new(
+                Coordinate::new(i  as u16, self.map.vec[0].len() as u16),
+                'r',
+                 LetterType::Border
+                ));
+            i += 1;
+        }
     }
     fn write_middle_letter(&mut self, letter: char){
         let x =  self.map.vec.len() /2;
         let y = self.map.vec[x].len() / 2;
-        self.writer(LetterType::regular,Coordinate::new(x as u16, y as u16),letter);
+        self.writer(Pixel::new(Coordinate::new(x as u16, y as u16),letter, LetterType::Regular));
     }
 
     fn check_surrounding_letters(&mut self, coords: Coordinate) {
-        let column_middle =  self.map.vec.len() /2;
-        let row_middle = self.map.vec[column_middle].len() / 2;
-
 
         if self.map.vec[coords.x as usize][coords.y as usize].char == ' ' {
         let mut offset: i32 = -1; 
@@ -149,12 +173,12 @@ impl MapManager {
         //check_sorrounding_letters();
         //}
     }
-    fn writer(&mut self, letter_type: LetterType,  pos: Coordinate, letter: char) {
-        self.map.vec[pos.x as usize][pos.y as usize].char = letter;
+    fn writer(&mut self, pixel: Pixel) { 
+        self.map.vec[pixel.location.x as usize][pixel.location.y as usize].char = pixel.char;
 
-        match letter_type {
-            LetterType::border => self.border_pos.push(pos),
-            LetterType::regular => self.last_written_pos.push(pos),
+        match pixel.letter_type {
+            LetterType::Border => self.border_pos.push(pixel.location),
+            LetterType::Regular => self.last_written_pos.push(pixel.location),
         }
     }
 }
