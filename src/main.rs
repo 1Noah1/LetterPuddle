@@ -15,11 +15,9 @@ use termion::{input::TermRead, event::Key, raw::IntoRawMode};
 use std::io::{self};
 
 fn main() {
-
-
     let handle = thread::spawn(|| {
         // Enable raw mode so that key events can be captured without pressing enter
-        let stdout = io::stdout().into_raw_mode().unwrap();
+        let _stdout = io::stdout().into_raw_mode().unwrap();
         // Create a handle for standard input (stdin)
         let mut  stdin = io::stdin().lock().keys();
 
@@ -27,7 +25,7 @@ fn main() {
             if let Some(Ok(Key::Esc)) = stdin.next() {
                 panic!("Esc key pressed. Exiting loop.");
             }
-            thread::sleep(time::Duration::from_millis(100));
+            thread::sleep(time::Duration::from_millis(10000));
         }
     });
 
