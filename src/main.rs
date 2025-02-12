@@ -21,12 +21,13 @@ fn main() {
         // Create a handle for standard input (stdin)
         let mut  stdin = io::stdin().lock().keys();
 
-        loop {
-            if let Some(Ok(Key::Esc)) = stdin.next() {
-                panic!("Esc key pressed. Exiting loop.");
-            }
-            thread::sleep(time::Duration::from_millis(10000));
-        }
+        // this causes shift in letters
+        // loop {
+            // if let Some(Ok(Key::Esc)) = stdin.next() {
+                // panic!("Esc key pressed. Exiting loop.");
+            // }
+            // thread::sleep(time::Duration::from_millis(10000));
+        // }
     });
 
     let mut manager = MapManager::new();
@@ -36,7 +37,7 @@ fn main() {
     MapManager::init(&mut manager);
     loop {
         MapManager::draw_map(&mut manager.map);
-        MapManager::grow(&mut manager);
+        // MapManager::grow(&mut manager);
         thread::sleep(time::Duration::from_millis(1000));
         if i <= 10 {
             break;

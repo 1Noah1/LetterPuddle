@@ -39,7 +39,7 @@ impl MapManager {
 
     pub fn draw_map(map: &Map) {
 
-        // what is this??
+        // what is this??  i can't remember writing this.
         //print!("{}[2J", 27 as char);
 
         map.vec.iter().for_each(|row| {
@@ -138,24 +138,25 @@ impl MapManager {
         // works fine
         // Now we have a situation where a surrounding letter is not empty 
         //
-        //
         //      B
         //     BAB
         //      B
+        //
         // in this case all B's will go to A and check it surrounding letters again.
         // Two possible solutions for this issue
         // First:
         //  hold a collection of every written value ever, seperate from last_written_pos
         //  check if the not empty value is in this collection
-        // Second: 
+        // Second (would only fix render not happenning, but not recursion issue): 
         //  parrallel rendering 
         //  rendering the map parallel to it being proccessed 
         //  advantage:
-        //      it would visually more dynamic (every step wouldn't completly lookl the same)
+        //      it would be visually more dynamic (every step wouldn't look completly the same)
         //      i would learn more about threading
         //  disadvantage:
         //      i would have to learn about threading and reading data while it is being modified
         //          i could probably just make a copy, render off of that and then throw it away
+        //          I'd hold a reference to the map. everytime i want to render, i make a copy of that, i render, throw copy away, repeat
 
 
 
