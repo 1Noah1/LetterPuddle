@@ -5,13 +5,19 @@ use crate::coordiante::Coordinate;
 use crate::dimensions::Dimensions;
 use crate::letter_type::LetterType;
 use crate::pixel::Pixel;
+use crate::letter_service::LetterService;
 
 use termion::cursor;
 pub struct MapManager {
     pub map: Map,
+    // is read by map::new()
     terminal_dimensions: Dimensions,
     last_written_pos: Vec<Coordinate>,
+    // this should save letters, which surrounding letters have already been check
+    // this prevents unwanted recursion
+    concrete_pos: HashMap<Coordinate, LetterType>,
     border_pos: HashMap<Coordinate, LetterType>
+    
 
 }
 
@@ -27,6 +33,7 @@ impl MapManager {
         Self {
             last_written_pos: vec![],
             border_pos: HashMap::new(),
+            concrete_pos: HashMap::new(),
             terminal_dimensions: terminal_dimensions,
             map: Map::new(terminal_dimensions)
         }
@@ -60,7 +67,7 @@ impl MapManager {
                 }
             );
             let mut i = 0;
-            // removing values old values
+            // removing old values
             while i < self.last_written_pos.len()  {
                 self.last_written_pos.remove(i);
                 i += 1
@@ -131,6 +138,7 @@ impl MapManager {
     }
 
     fn check_surrounding_letters(&mut self, coords: Coordinate) {
+        
         // this function would cause endless recursion till the whole map is filled out and even beyond that
         // why??
         // when a value lets say we have the middle letter set
@@ -158,18 +166,37 @@ impl MapManager {
         //          i could probably just make a copy, render off of that and then throw it away
         //          I'd hold a reference to the map. everytime i want to render, i make a copy of that, i render, throw copy away, repeat
 
-
-
         if self.map.vec[coords.x as usize][coords.y as usize].char == ' ' {
-            //let surrounding_letter = self.for_each_direction(coords, None);
+
+
+            let mut surrounding_letters: Vec<char> = vec![];
+            if let Some(s) = self.for_each_direction(coords, None){
+                s.iter().for_each(|l| surrounding_letters.push(l.char));
+            }
+            self.writer(
+                Pixel { 
+                    location: coords, 
+                    char: LetterService::get_letter(&surrounding_letters), 
+                    letter_type: LetterType::Regular, 
+                    is_concrete: true, 
+                }
+                ); 
+
 
             // write them to possibility map
             // get own letter
         }else {
-            self.for_each_direction(
-                coords,
-                 Some(&MapManager::check_surrounding_letters)
-                );
+            //if (!self.map.vec[coords.x][coords.y].is concrete)
+            match self.concrete_pos.get(&coords)  {
+                Some(_) => {},
+                None => {
+                    self.for_each_direction (
+                        coords,
+                         Some(&MapManager::check_surrounding_letters)
+                        );
+                    self.concrete_pos.insert(coords, LetterType::Regular);
+                }
+            }
         }
     }
     
@@ -181,30 +208,30 @@ impl MapManager {
         let mut i = 0;
         let mut values = vec![];
 
-        //  if the center letter is already in a corner, i will go out of bounds!!
+        // TODO: fix: if the center letter is already in a corner, i will go out of bounds!!
         while i < 4 {
             // horizontal letters
-            if i < 2 {
-                match self.border_pos.get(&Coordinate::new(coords.x +  offset as u16, coords.y)) {
+            if i < 2  {
+                match self.border_pos.get(&Coordinate::new((coords.x as i32 +  offset) as u16, coords.y)) {
                     None =>  {
                         match f {
                             Some(f) => {
-                                f(self, Coordinate{x: coords.x + offset as u16, y: coords.y})
+                                f(self, Coordinate{x: (coords.x as i32 + offset) as u16, y: coords.y})
                             },
-                            None => values.push(self.map.vec[(coords.x + offset as u16)as usize][coords.y as usize])
+                            None => values.push(self.map.vec[(coords.x as i32 + offset) as usize][coords.y as usize])
                         }
                     }
                     _ => {/*border hit*/}
                 }
             // vertical  letters
             }else {
-                match self.border_pos.get(&Coordinate{x: coords.x, y: coords.y +  offset as u16}) {
+                match self.border_pos.get(&Coordinate{x: coords.x, y: (coords.y as i32 +  offset) as u16}) {
                     None =>  {
                         match f {
                             Some(f) => {
-                                f(self, Coordinate{x: coords.x, y: coords.y  + offset as u16});
+                                f(self, Coordinate{x: coords.x, y: (coords.y as i32  + offset) as u16});
                             },
-                            None => values.push(self.map.vec[coords.x as usize][(coords.y + offset as u16)as usize])
+                            None => values.push(self.map.vec[coords.x as usize][(coords.y as i32 + offset)as usize])
                         }
                     }
                     _ => {/*border hit*/}
@@ -214,9 +241,8 @@ impl MapManager {
             if offset < 1{
                 offset += 2;
             }else{
-                offset = 0;
+                offset = -1;
             }
-            
         }
         match f {
                 Some(_) => return None,
@@ -227,6 +253,7 @@ impl MapManager {
 
     fn writer(&mut self, pixel: Pixel) { 
         self.map.vec[pixel.location.x as usize][pixel.location.y as usize].char = pixel.char;
+        println!("writing: {:?}", pixel);
 
         match pixel.letter_type {
             LetterType::Border => {self.border_pos.insert(pixel.location, pixel.letter_type);}

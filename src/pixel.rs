@@ -4,7 +4,8 @@ use crate::{coordiante::Coordinate, letter_type::LetterType};
 pub struct Pixel {
     pub location: Coordinate,
     pub char: char,
-    pub letter_type: LetterType
+    pub letter_type: LetterType,
+    pub is_concrete: bool
 }
 
 impl Pixel {
@@ -13,6 +14,7 @@ impl Pixel {
             location: location,
             char: char,
             letter_type: letter_type,
+            is_concrete: false
         }
     }
 }
