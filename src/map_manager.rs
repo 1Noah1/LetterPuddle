@@ -267,6 +267,5 @@ impl MapManager {
             LetterType::Border => {self.border_pos.insert(pixel.location, pixel.letter_type);}
             LetterType::Regular => self.last_written_pos.push(pixel.location)
         }
-        MapManager::draw_map(&self.map);
     }
 }
