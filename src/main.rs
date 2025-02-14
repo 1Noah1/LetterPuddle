@@ -22,17 +22,20 @@ fn main() {
     thread::sleep(time::Duration::from_millis(0));
 
     MapManager::init(&mut manager);
+    let start = Instant::now();
     loop {
         let start = Instant::now();
         MapManager::draw_map(&mut manager.map);
         MapManager::grow(&mut manager);
-        println!("main i: {}", i);
-        thread::sleep(time::Duration::from_millis(1000));
+        //println!("main i: {}", i);
+        //thread::sleep(time::Duration::from_millis(0));
         let end = Instant::now();
-        println!("time: {:?}", end.duration_since(start));
-        if i == 1 {
+        //println!("time: {:?}", end.duration_since(start));
+        if i == 10 {
             break;
         }
         i += 1;
     }
+    let end = Instant::now();
+    print!("total_time: {:?}", end.duration_since(start))
 }

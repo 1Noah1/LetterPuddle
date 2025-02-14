@@ -1,4 +1,6 @@
 use std::collections::HashMap;
+use std::os::unix::fs::PermissionsExt;
+use std::{thread, time};
 
 use crate::map::Map;
 use crate::coordiante::Coordinate;
@@ -13,10 +15,11 @@ pub struct MapManager {
     // is read by map::new()
     terminal_dimensions: Dimensions,
     last_written_pos: Vec<Coordinate>,
-    // this should save letters, which surrounding letters have already been check
+    // this should save letters, which surrounding letters have already been checked,
+    // after they've been assigned a letter
     // this prevents unwanted recursion
-    concrete_pos: HashMap<Coordinate, LetterType>,
-    border_pos: HashMap<Coordinate, LetterType>
+    border_pos: HashMap<Coordinate, LetterType>,
+    generation: u16
     
 
 }
@@ -33,9 +36,9 @@ impl MapManager {
         Self {
             last_written_pos: vec![],
             border_pos: HashMap::new(),
-            concrete_pos: HashMap::new(),
             terminal_dimensions: terminal_dimensions,
-            map: Map::new(terminal_dimensions)
+            map: Map::new(terminal_dimensions),
+            generation: 0
         }
     }
 
@@ -58,7 +61,74 @@ impl MapManager {
         });
    } 
 
+    fn write_borders(&mut self) {
+        // the border should also be written using the writer
+        // but last time i tried doing that, i fucked up everything
+        // but it still needs to be done
+        // why?
+        // so i can write the border points into an array and know where i can't grow any further
+        let mut i = 0;
+
+        //top border
+        while i <= self.map.vec[0].len() -1 {
+            self.writer(Pixel::new(
+                Coordinate::new(0 as u16, i as u16),
+                't',
+                 LetterType::Border,
+                 0
+                ));
+            i += 1;
+        }
+ 
+        i = 0;
+        //bottom border
+        while i <= self.map.vec[0].len() -1 {
+            self.writer(Pixel::new(
+                Coordinate::new((self.map.vec.len() -1)  as u16, i as u16),
+                'b',
+                 LetterType::Border,
+                 0
+                ));
+            i += 1;
+        }
+        i = 0;
+
+        //left border
+        while i <= self.map.vec.len() -1 {
+            self.writer(Pixel::new(
+                Coordinate::new(i  as u16, 0 as u16),
+                'l',
+                 LetterType::Border,
+                 0
+                ));
+            i += 1;
+        }
+
+        i = 0;
+        //right border 
+        while i <= self.map.vec.len() -1 {
+            self.writer(Pixel::new(
+                Coordinate::new(i  as u16, (self.map.vec[0].len() -1) as u16),
+                'r',
+                 LetterType::Border,
+                 0
+                ));
+            i += 1;
+        }
+    }
+    fn write_middle_letter(&mut self, letter: char){
+        let x =  self.map.vec.len() /2;
+        let y = self.map.vec[x].len() / 2;
+        self.writer(Pixel::new(
+            Coordinate::new(x as u16, y as u16),
+            letter,
+             LetterType::Regular,
+            0
+        ));
+    }
+
     pub fn grow(&mut self) {
+        self.generation += 1;
         if self.last_written_pos.len() > 0 {
             let mut coords_to_check: Vec<Coordinate> = vec![];
             self.last_written_pos.iter().for_each(
@@ -76,65 +146,8 @@ impl MapManager {
                 self.check_surrounding_letters(coord);
             }
         }else{
-            self.write_middle_letter('A');
+            //self.write_middle_letter('A');
         }
-    }
-
-    fn write_borders(&mut self) {
-        // the border should also be written using the writer
-        // but last time i tried doing that, i fucked up everything
-        // but it still needs to be done
-        // why?
-        // so i can write the border points into an array and know where i can't grow any further
-        let mut i = 0;
-
-        //top border
-        while i <= self.map.vec[0].len() -1 {
-            self.writer(Pixel::new(
-                Coordinate::new(0 as u16, i as u16),
-                't',
-                 LetterType::Border
-                ));
-            i += 1;
-        }
- 
-        i = 0;
-        //bottom border
-        while i <= self.map.vec[0].len() -1 {
-            self.writer(Pixel::new(
-                Coordinate::new((self.map.vec.len() -1)  as u16, i as u16),
-                'b',
-                 LetterType::Border
-                ));
-            i += 1;
-        }
-        i = 0;
-
-        //left border
-        while i <= self.map.vec.len() -1 {
-            self.writer(Pixel::new(
-                Coordinate::new(i  as u16, 0 as u16),
-                'l',
-                 LetterType::Border
-                ));
-            i += 1;
-        }
-
-        i = 0;
-        //right border 
-        while i <= self.map.vec.len() -1 {
-            self.writer(Pixel::new(
-                Coordinate::new(i  as u16, (self.map.vec[0].len() -1) as u16),
-                'r',
-                 LetterType::Border
-                ));
-            i += 1;
-        }
-    }
-    fn write_middle_letter(&mut self, letter: char){
-        let x =  self.map.vec.len() /2;
-        let y = self.map.vec[x].len() / 2;
-        self.writer(Pixel::new(Coordinate::new(x as u16, y as u16),letter, LetterType::Regular));
     }
 
     fn check_surrounding_letters(&mut self, coords: Coordinate) {
@@ -153,6 +166,7 @@ impl MapManager {
         // in this case all B's will go to A and check it surrounding letters again.
         // Two possible solutions for this issue
         // First:
+        // (UPDATE: i'm currently doing this)
         //  hold a collection of every written value ever, seperate from last_written_pos
         //  check if the not empty value is in this collection
         // Second (would only fix render not happenning, but not recursion issue): 
@@ -168,35 +182,25 @@ impl MapManager {
 
         if self.map.vec[coords.x as usize][coords.y as usize].char == ' ' {
 
-
             let mut surrounding_letters: Vec<char> = vec![];
             if let Some(s) = self.for_each_direction(coords, None){
                 s.iter().for_each(|l| surrounding_letters.push(l.char));
             }
-            self.writer(
-                Pixel { 
+            self.writer(Pixel { 
                     location: coords, 
-                    char: LetterService::get_letter(&surrounding_letters), 
+                    char: LetterService::get_gen_Letter(self.generation),/*LetterService::get_letter(&surrounding_letters), */
                     letter_type: LetterType::Regular, 
-                    is_concrete: true, 
-                }
-                ); 
-
+                    generation: self.generation
+                });
 
             // write them to possibility map
             // get own letter
         }else {
-            //if (!self.map.vec[coords.x][coords.y].is concrete)
-            match self.concrete_pos.get(&coords)  {
-                Some(_) => {},
-                None => {
                     self.for_each_direction (
                         coords,
                          Some(&MapManager::check_surrounding_letters)
                         );
-                    self.concrete_pos.insert(coords, LetterType::Regular);
-                }
-            }
+            
         }
     }
     
@@ -212,11 +216,14 @@ impl MapManager {
         while i < 4 {
             // horizontal letters
             if i < 2  {
-                match self.border_pos.get(&Coordinate::new((coords.x as i32 +  offset) as u16, coords.y)) {
+                let offset_x = coords.x as i32 + offset;
+                match self.border_pos.get(&Coordinate::new(offset_x as u16, coords.y)) {
                     None =>  {
                         match f {
                             Some(f) => {
-                                f(self, Coordinate{x: (coords.x as i32 + offset) as u16, y: coords.y})
+                                if self.map.vec[offset_x as usize][coords.y as usize].generation > self.generation {
+                                    f(self, Coordinate{x: (coords.x as i32 + offset) as u16, y: coords.y})
+                                }
                             },
                             None => values.push(self.map.vec[(coords.x as i32 + offset) as usize][coords.y as usize])
                         }
@@ -225,13 +232,16 @@ impl MapManager {
                 }
             // vertical  letters
             }else {
-                match self.border_pos.get(&Coordinate{x: coords.x, y: (coords.y as i32 +  offset) as u16}) {
+                let offset_y = coords.y as i32 + offset;
+                match self.border_pos.get(&Coordinate{x: coords.x, y: (offset_y) as u16}) {
                     None =>  {
                         match f {
                             Some(f) => {
-                                f(self, Coordinate{x: coords.x, y: (coords.y as i32  + offset) as u16});
+                                if self.map.vec[coords.x as usize][offset_y as usize].generation > self.generation{
+                                    f(self, Coordinate{x: coords.x, y: offset_y as u16});
+                                }
                             },
-                            None => values.push(self.map.vec[coords.x as usize][(coords.y as i32 + offset)as usize])
+                            None => values.push(self.map.vec[coords.x as usize][offset_y as usize])
                         }
                     }
                     _ => {/*border hit*/}
@@ -252,12 +262,12 @@ impl MapManager {
 
 
     fn writer(&mut self, pixel: Pixel) { 
-        self.map.vec[pixel.location.x as usize][pixel.location.y as usize].char = pixel.char;
-        println!("writing: {:?}", pixel);
-
+        self.map.vec[pixel.location.x as usize][pixel.location.y as usize] = pixel;
+        thread::sleep(time::Duration::from_millis(100));
         match pixel.letter_type {
             LetterType::Border => {self.border_pos.insert(pixel.location, pixel.letter_type);}
             LetterType::Regular => self.last_written_pos.push(pixel.location)
         }
+        MapManager::draw_map(&self.map);
     }
 }

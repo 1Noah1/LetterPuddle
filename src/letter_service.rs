@@ -24,25 +24,30 @@ impl LetterService{
         });
 
         let total_probability: f32 = probabilities.values().sum();  
-
         let rnd_num =  rand::rng().random_range(0.0..total_probability);
-
-
-    let mut cumulative_probability: f32 = 0.0;
+        let mut cumulative_probability: f32 = 0.0;
     
-    // this is omega stupid, i should be able to just return whithin the loop itself
-    // TODO: OPTIMIZE PLEASE
-    let mut final_letter = ' ';
-    for (l, p) in probabilities {
-        cumulative_probability += p;
-        if rnd_num <= cumulative_probability {
-            final_letter = l;
+        // this is omega stupid, i should be able to just return whithin the loop itself
+        // TODO: OPTIMIZE PLEASE
+        let mut final_letter = ' ';
+        for (l, p) in probabilities {
+            cumulative_probability += p;
+            if rnd_num <= cumulative_probability {
+                final_letter = l;
+            }
         }
+        final_letter
     }
-    final_letter
 
-        
-        
-
+    pub fn get_gen_Letter(number: u16)-> char{
+    let mut i = 1;
+    let mut letter = ' ';
+        for c in 'A'..='Z' {
+            if i == number {
+                letter = c;
+            }
+            i += 1;
+        }
+        letter
     }
 }
