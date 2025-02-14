@@ -28,7 +28,7 @@ fn main() {
         MapManager::draw_map(&mut manager.map);
         MapManager::grow(&mut manager);
         //println!("main i: {}", i);
-        //thread::sleep(time::Duration::from_millis(0));
+        thread::sleep(time::Duration::from_millis(100));
         let end = Instant::now();
         //println!("time: {:?}", end.duration_since(start));
         if i == 10 {

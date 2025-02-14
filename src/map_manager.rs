@@ -260,10 +260,9 @@ impl MapManager {
         }
     }
 
-
     fn writer(&mut self, pixel: Pixel) { 
         self.map.vec[pixel.location.x as usize][pixel.location.y as usize] = pixel;
-        thread::sleep(time::Duration::from_millis(100));
+        //thread::sleep(time::Duration::from_millis(0));
         match pixel.letter_type {
             LetterType::Border => {self.border_pos.insert(pixel.location, pixel.letter_type);}
             LetterType::Regular => self.last_written_pos.push(pixel.location)
