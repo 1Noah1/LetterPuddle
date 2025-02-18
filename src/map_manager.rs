@@ -98,8 +98,8 @@ impl MapManager {
         // so i can write the border points into an array and know where i can't grow any further
         let mut i = 0;
 
-        let right_left =  '|';
-        let top_bottom=  '-';
+        let right_left = '|';
+        let top_bottom = '-';
 
         //top border
         while i <= self.map.vec[0].len() - 1 {
