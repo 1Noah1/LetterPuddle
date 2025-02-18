@@ -1,3 +1,4 @@
+use colored::Color;
 use rand::Rng;
 use std::collections::HashMap;
 
@@ -6,14 +7,14 @@ pub struct LetterService;
 impl LetterService {
     pub fn get_letter(found_letters: &Vec<char>) -> char {
         let mut probabilities: HashMap<char, f32> = HashMap::new();
-        for letter in 'A'..='Z' {
+        for letter in 'A'..='F' {
             probabilities.insert(letter, 0.1);
         }
 
         // adds found letters to map
         found_letters.iter().for_each(|l| {
             if let Some(p) = probabilities.get_mut(l) {
-                *p += 25.5
+                *p += 15.0
             }
         });
 
@@ -43,5 +44,16 @@ impl LetterService {
             i += 1;
         }
         letter
+    }
+    pub fn get_colors(letter: char) -> Color {
+        match letter {
+            'A' => Color::Blue,
+            'B' => Color::Cyan,
+            'C' => Color::Green,
+            'D' => Color::Yellow,
+            'E' => Color::Red,
+            'F' => Color::Magenta,
+            _ => Color::White,
+        }
     }
 }
