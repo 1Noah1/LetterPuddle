@@ -98,11 +98,14 @@ impl MapManager {
         // so i can write the border points into an array and know where i can't grow any further
         let mut i = 0;
 
+        let right_left =  '|';
+        let top_bottom=  '-';
+
         //top border
         while i <= self.map.vec[0].len() - 1 {
             self.writer(Pixel::new(
                 Coordinate::new(0 as u16, i as u16),
-                '-',
+                top_bottom,
                 LetterType::Border,
                 0,
             ));
@@ -114,7 +117,7 @@ impl MapManager {
         while i <= self.map.vec[0].len() - 1 {
             self.writer(Pixel::new(
                 Coordinate::new((self.map.vec.len() - 1) as u16, i as u16),
-                '-',
+                top_bottom,
                 LetterType::Border,
                 0,
             ));
@@ -126,7 +129,7 @@ impl MapManager {
         while i <= self.map.vec.len() - 1 {
             self.writer(Pixel::new(
                 Coordinate::new(i as u16, 0 as u16),
-                '|',
+                right_left,
                 LetterType::Border,
                 0,
             ));
@@ -138,7 +141,7 @@ impl MapManager {
         while i <= self.map.vec.len() - 1 {
             self.writer(Pixel::new(
                 Coordinate::new(i as u16, (self.map.vec[0].len() - 1) as u16),
-                '|',
+                right_left,
                 LetterType::Border,
                 0,
             ));
