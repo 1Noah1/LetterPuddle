@@ -8,7 +8,7 @@ use crate::map::Map;
 use crate::pixel::Pixel;
 
 use colored::{Color, Colorize};
-use termion::cursor;
+use termion::{color, cursor};
 pub struct MapManager {
     pub map: Map,
     // is read by map::new()
@@ -54,12 +54,12 @@ impl MapManager {
 
                 // print colored letters
                 match LetterService::get_colors(pixel.char) {
-                    Color::Blue => print!("{}", pixel.char.to_string().blue()),
-                    Color::Red => print!("{}", pixel.char.to_string().red()),
-                    Color::Magenta => print!("{}", pixel.char.to_string().magenta()),
-                    Color::Green => print!("{}", pixel.char.to_string().green()),
-                    Color::Cyan => print!("{}", pixel.char.to_string().cyan()),
-                    Color::Yellow => print!("{}", pixel.char.to_string().yellow()),
+                    Color::Blue => print!("{}{}", pixel.char, color::Fg(color::Blue)),
+                    Color::Red => print!("{}{}", pixel.char, color::Fg(color::Red)),
+                    Color::Magenta => print!("{}{}", pixel.char, color::Fg(color::Magenta)),
+                    Color::Green => print!("{}{}", pixel.char, color::Fg(color::Green)),
+                    Color::Cyan => print!("{}{}", pixel.char, color::Fg(color::Cyan)),
+                    Color::Yellow => print!("{}{}", pixel.char, color::Fg(color::Yellow)),
                     _ => print!("{}", pixel.char),
                 }
 
