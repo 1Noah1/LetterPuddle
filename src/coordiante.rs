@@ -1,10 +1,10 @@
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub struct Coordinate {
-    pub x: u16,
-    pub y: u16,
+    pub x: u32,
+    pub y: u32,
 }
 impl Coordinate {
-    pub fn new(x: u16, y: u16) -> Coordinate {
+    pub fn new(x: u32, y: u32) -> Coordinate {
         Coordinate { x: x, y: y }
     }
 }

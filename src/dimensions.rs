@@ -1,5 +1,5 @@
 #[derive(Debug, Clone, Copy)]
 pub struct Dimensions {
-    pub width: u16,
-    pub height: u16,
+    pub width: u32,
+    pub height: u32,
 }

@@ -18,7 +18,7 @@ pub struct MapManager {
     // after they've been assigned a letter
     // this prevents unwanted recursion
     border_pos: HashMap<Coordinate, LetterType>,
-    generation: u16,
+    generation: u32,
 }
 
 impl MapManager {
@@ -47,7 +47,7 @@ impl MapManager {
     pub fn draw_map(map: &Map) {
         map.vec.iter().for_each(|row| {
             row.iter().for_each(|pixel| {
-                cursor::Goto(pixel.location.x, pixel.location.y);
+                cursor::Goto(pixel.location.x as u16, pixel.location.y as u16);
 
                 // no colors
                 //print!("{}", pixel.char);
@@ -104,7 +104,7 @@ impl MapManager {
         //top border
         while i <= self.map.vec[0].len() - 1 {
             self.writer(Pixel::new(
-                Coordinate::new(0 as u16, i as u16),
+                Coordinate::new(0 as u32, i as u32),
                 top_bottom,
                 LetterType::Border,
                 0,
@@ -116,7 +116,7 @@ impl MapManager {
         //bottom border
         while i <= self.map.vec[0].len() - 1 {
             self.writer(Pixel::new(
-                Coordinate::new((self.map.vec.len() - 1) as u16, i as u16),
+                Coordinate::new((self.map.vec.len() - 1) as u32, i as u32),
                 top_bottom,
                 LetterType::Border,
                 0,
@@ -128,7 +128,7 @@ impl MapManager {
         //left border
         while i <= self.map.vec.len() - 1 {
             self.writer(Pixel::new(
-                Coordinate::new(i as u16, 0 as u16),
+                Coordinate::new(i as u32, 0 as u32),
                 right_left,
                 LetterType::Border,
                 0,
@@ -140,7 +140,7 @@ impl MapManager {
         //right border
         while i <= self.map.vec.len() - 1 {
             self.writer(Pixel::new(
-                Coordinate::new(i as u16, (self.map.vec[0].len() - 1) as u16),
+                Coordinate::new(i as u32, (self.map.vec[0].len() - 1) as u32),
                 right_left,
                 LetterType::Border,
                 0,
@@ -152,7 +152,7 @@ impl MapManager {
         let x = self.map.vec.len() / 2;
         let y = self.map.vec[x].len() / 2;
         self.writer(Pixel::new(
-            Coordinate::new(x as u16, y as u16),
+            Coordinate::new(x as u32, y as u32),
             letter,
             LetterType::Regular,
             0,
@@ -216,7 +216,7 @@ impl MapManager {
                 let offset_x = coords.x as i32 + offset;
                 match self
                     .border_pos
-                    .get(&Coordinate::new(offset_x as u16, coords.y))
+                    .get(&Coordinate::new(offset_x as u32, coords.y))
                 {
                     None => match f {
                         Some(f) => {
@@ -226,7 +226,7 @@ impl MapManager {
                                 f(
                                     self,
                                     Coordinate {
-                                        x: (coords.x as i32 + offset) as u16,
+                                        x: (coords.x as i32 + offset) as u32,
                                         y: coords.y,
                                     },
                                 )
@@ -243,7 +243,7 @@ impl MapManager {
                 let offset_y = coords.y as i32 + offset;
                 match self.border_pos.get(&Coordinate {
                     x: coords.x,
-                    y: (offset_y) as u16,
+                    y: (offset_y) as u32,
                 }) {
                     None => match f {
                         Some(f) => {
@@ -254,7 +254,7 @@ impl MapManager {
                                     self,
                                     Coordinate {
                                         x: coords.x,
-                                        y: offset_y as u16,
+                                        y: offset_y as u32,
                                     },
                                 );
                             }

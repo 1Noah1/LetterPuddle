@@ -5,7 +5,7 @@ pub struct Pixel {
     pub location: Coordinate,
     pub char: char,
     pub letter_type: LetterType,
-    pub generation: u16,
+    pub generation: u32,
 }
 
 impl Pixel {
@@ -13,7 +13,7 @@ impl Pixel {
         location: Coordinate,
         char: char,
         letter_type: LetterType,
-        generation: u16,
+        generation: u32,
     ) -> Pixel {
         Pixel {
             location: location,
