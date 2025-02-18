@@ -1,14 +1,17 @@
-mod map_manager;
 pub mod coordiante;
-pub mod map;
 pub mod dimensions;
+pub mod letter_service;
+pub mod letter_type;
+pub mod map;
+mod map_manager;
 pub mod pixel;
-pub mod letter_type; 
-pub mod letter_service; 
 
-use map_manager::MapManager;
 use core::time;
-use std::{thread::{self}, time::{Instant}};
+use map_manager::MapManager;
+use std::{
+    thread::{self},
+    time::Instant,
+};
 
 //use termion::cursor;
 // use termion::{input::TermRead, event::Key, raw::IntoRawMode};
@@ -28,10 +31,10 @@ fn main() {
         MapManager::draw_map(&mut manager.map);
         MapManager::grow(&mut manager);
         //println!("main i: {}", i);
-        thread::sleep(time::Duration::from_millis(100));
+        //thread::sleep(time::Duration::from_millis(100));
         let end = Instant::now();
-        //println!("time: {:?}", end.duration_since(start));
-        if i == 10 {
+        println!("time: {:?}", end.duration_since(start));
+        if i == 80 {
             break;
         }
         i += 1;
