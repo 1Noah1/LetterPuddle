@@ -22,8 +22,8 @@ impl Map {
         for column in vec.iter_mut() {
             let mut j = 0;
             for pixel in column.iter_mut() {
-                pixel.location.x = i as u16;
-                pixel.location.y = j as u16;
+                pixel.location.x = i as u32;
+                pixel.location.y = j as u32;
                 j += 1;
             }
             i += 1;

@@ -34,7 +34,7 @@ impl LetterService {
         final_letter
     }
 
-    pub fn get_gen_letter(number: u16) -> char {
+    pub fn get_gen_letter(number: u32) -> char {
         let mut i = 1;
         let mut letter = ' ';
         for c in 'A'..='Z' {
