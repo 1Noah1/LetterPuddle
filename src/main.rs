@@ -23,10 +23,10 @@ fn main() {
         let start = Instant::now();
         MapManager::draw_map(&mut manager.map);
         MapManager::grow(&mut manager);
-        thread::sleep(time::Duration::from_millis(100));
+        //thread::sleep(time::Duration::from_millis(50));
         let end = Instant::now();
         println!("time: {:?}", end.duration_since(start));
-        if i == 80 {
+        if i == 68 {
             break;
         }
         i += 1;

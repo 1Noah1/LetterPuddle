@@ -7,6 +7,7 @@ use crate::letter_type::LetterType;
 use crate::map::Map;
 use crate::pixel::Pixel;
 
+use colored::{Color, Colorize};
 use termion::cursor;
 pub struct MapManager {
     pub map: Map,
@@ -47,7 +48,44 @@ impl MapManager {
         map.vec.iter().for_each(|row| {
             row.iter().for_each(|pixel| {
                 cursor::Goto(pixel.location.x, pixel.location.y);
-                print!("{}", pixel.char);
+
+                // no colors 
+                //print!("{}", pixel.char);
+
+                // print colored letters
+                match LetterService::get_colors(pixel.char) {
+                    Color::Blue => print!("{}", pixel.char.to_string().blue()),
+                    Color::Red => print!("{}", pixel.char.to_string().red()),
+                    Color::Magenta => print!("{}", pixel.char.to_string().magenta()),
+                    Color::Green => print!("{}", pixel.char.to_string().green()),
+                    Color::Cyan => print!("{}", pixel.char.to_string().cyan()),
+                    Color::Yellow => print!("{}", pixel.char.to_string().yellow()),
+                    _ => print!("{}", pixel.char)
+                }
+
+                // one symbol draw
+                // let symbol = '#';
+                // match LetterService::get_colors(pixel.char) {
+                    // Color::Blue => print!("{}", symbol.to_string().blue()),
+                    // Color::Red => print!("{}", symbol.to_string().red()),
+                    // Color::Magenta => print!("{}", symbol.to_string().magenta()),
+                    // Color::Green => print!("{}", symbol.to_string().green()),
+                    // Color::Cyan => print!("{}", symbol.to_string().cyan()),
+                    // Color::Yellow => print!("{}", symbol.to_string().yellow()),
+                    // _ => print!("{}", pixel.char)
+                // }
+
+                // print color only
+                // match LetterService::get_colors(pixel.char) {
+                    // Color::Blue => print!("{}", " ".to_string().on_blue()),
+                    // Color::Red => print!("{}", " ".to_string().on_red()),
+                    // Color::Magenta => print!("{}", " ".to_string().on_magenta()),
+                    // Color::Green => print!("{}", " ".to_string().on_green()),
+                    // Color::Cyan => print!("{}", " ".to_string().on_cyan()),
+                    // Color::Yellow => print!("{}", " ".to_string().on_yellow()),
+                    // _ => print!("{}", pixel.char)
+                // }
+
             });
             println!();
         });
