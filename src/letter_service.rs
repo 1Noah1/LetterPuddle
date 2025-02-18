@@ -1,6 +1,6 @@
 use colored::Color;
 use rand::Rng;
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
 pub struct LetterService;
 
