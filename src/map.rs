@@ -8,14 +8,20 @@ pub struct Map {
 }
 impl Map {
     pub fn new(dimensions: Dimensions) -> Map {
-        let mut vec: Vec<Vec<Pixel>> =
+        let mut vec: Vec<Vec<Pixel>> = vec![
             vec![
-                vec![
-                    Pixel::new(Coordinate::new(0, 0), ' ', LetterType::Regular, 1000);
-                    dimensions.width as usize
-                ];
-                dimensions.height as usize
+                Pixel::new(
+                    Coordinate::new(0, 0),
+                    ' ',
+                    LetterType::Regular,
+                    1000,
+                    true,
+                    colored::Color::White
+                );
+                dimensions.width as usize
             ];
+            dimensions.height as usize
+        ];
 
         //<---- assign coordinates ---->
         let mut i = 0;

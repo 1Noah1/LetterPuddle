@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 
-use crate::coordiante::Coordinate;
+use crate::config;
 use crate::dimensions::Dimensions;
 use crate::letter_service::LetterService;
 use crate::letter_type::LetterType;
 use crate::map::Map;
 use crate::pixel::Pixel;
+use crate::{config::Config, coordiante::Coordinate};
 
 use colored::{Color, Colorize};
 use termion::cursor;
@@ -19,10 +20,11 @@ pub struct MapManager {
     // this prevents unwanted recursion
     border_pos: HashMap<Coordinate, LetterType>,
     generation: u32,
+    config: Config,
 }
 
 impl MapManager {
-    pub fn new() -> MapManager {
+    pub fn new(config: &Config) -> MapManager {
         //terminal dimension can be obtained through running termion::terminal_size()
         let terminal_dimensions = Dimensions {
             // i dont know why, but w:50, 20, definetly works
@@ -36,6 +38,7 @@ impl MapManager {
             //terminal_dimensions: terminal_dimensions,
             map: Map::new(terminal_dimensions),
             generation: 0,
+            config: config.clone(),
         }
     }
 
@@ -44,7 +47,7 @@ impl MapManager {
         self.write_middle_letter('A')
     }
 
-    pub fn draw_map(map: &Map) {
+    pub fn draw_map(config: &Config, map: &Map) {
         map.vec.iter().for_each(|row| {
             row.iter().for_each(|pixel| {
                 cursor::Goto(pixel.location.x as u16, pixel.location.y as u16);
@@ -52,15 +55,29 @@ impl MapManager {
                 // no colors
                 //print!("{}", pixel.char);
 
-                // print colored letters
-                match LetterService::get_colors(pixel.char) {
-                    Color::Blue => print!("{}", pixel.char.to_string().blue()),
-                    Color::Red => print!("{}", pixel.char.to_string().red()),
-                    Color::Magenta => print!("{}", pixel.char.to_string().magenta()),
-                    Color::Green => print!("{}", pixel.char.to_string().green()),
-                    Color::Cyan => print!("{}", pixel.char.to_string().cyan()),
-                    Color::Yellow => print!("{}", pixel.char.to_string().yellow()),
-                    _ => print!("{}", pixel.char),
+                if config.render_letters {
+                    // print  letters
+                    match pixel.color {
+                        Color::Blue => print!("{}", pixel.char.to_string().blue()),
+                        Color::Red => print!("{}", pixel.char.to_string().red()),
+                        Color::Magenta => print!("{}", pixel.char.to_string().magenta()),
+                        Color::Green => print!("{}", pixel.char.to_string().green()),
+                        Color::Cyan => print!("{}", pixel.char.to_string().cyan()),
+                        Color::Yellow => print!("{}", pixel.char.to_string().yellow()),
+                        _ => print!("{}", pixel.char.to_string().white()),
+                    }
+                } else {
+                    // print color only
+
+                    match pixel.color {
+                        Color::Blue => print!("{}", " ".to_string().on_blue()),
+                        Color::Red => print!("{}", " ".to_string().on_red()),
+                        Color::Magenta => print!("{}", " ".to_string().on_magenta()),
+                        Color::Green => print!("{}", " ".to_string().on_green()),
+                        Color::Cyan => print!("{}", " ".to_string().on_cyan()),
+                        Color::Yellow => print!("{}", " ".to_string().on_yellow()),
+                        _ => print!("{}", pixel.char),
+                    }
                 }
 
                 // one symbol draw
@@ -72,17 +89,6 @@ impl MapManager {
                 // Color::Green => print!("{}", symbol.to_string().green()),
                 // Color::Cyan => print!("{}", symbol.to_string().cyan()),
                 // Color::Yellow => print!("{}", symbol.to_string().yellow()),
-                // _ => print!("{}", pixel.char)
-                // }
-
-                // print color only
-                // match LetterService::get_colors(pixel.char) {
-                // Color::Blue => print!("{}", " ".to_string().on_blue()),
-                // Color::Red => print!("{}", " ".to_string().on_red()),
-                // Color::Magenta => print!("{}", " ".to_string().on_magenta()),
-                // Color::Green => print!("{}", " ".to_string().on_green()),
-                // Color::Cyan => print!("{}", " ".to_string().on_cyan()),
-                // Color::Yellow => print!("{}", " ".to_string().on_yellow()),
                 // _ => print!("{}", pixel.char)
                 // }
             });
@@ -108,6 +114,8 @@ impl MapManager {
                 top_bottom,
                 LetterType::Border,
                 0,
+                true,
+                Color::White,
             ));
             i += 1;
         }
@@ -120,6 +128,8 @@ impl MapManager {
                 top_bottom,
                 LetterType::Border,
                 0,
+                true,
+                Color::White,
             ));
             i += 1;
         }
@@ -132,6 +142,8 @@ impl MapManager {
                 right_left,
                 LetterType::Border,
                 0,
+                true,
+                Color::White,
             ));
             i += 1;
         }
@@ -144,6 +156,8 @@ impl MapManager {
                 right_left,
                 LetterType::Border,
                 0,
+                true,
+                Color::White,
             ));
             i += 1;
         }
@@ -156,6 +170,12 @@ impl MapManager {
             letter,
             LetterType::Regular,
             0,
+            self.config.render_letters,
+            if self.config.colored {
+                LetterService::get_color(letter)
+            } else {
+                Color::White
+            },
         ));
     }
 
@@ -186,15 +206,23 @@ impl MapManager {
             if let Some(s) = self.for_each_direction(coords, None) {
                 s.iter().for_each(|l| surrounding_letters.push(l.char));
             }
-            self.writer(Pixel {
-                    location: coords,
-                    char: /*LetterService::get_gen_letter(self.generation) */ LetterService::get_letter(&surrounding_letters),
-                    letter_type: LetterType::Regular,
-                    generation: self.generation
-                });
-
-            // write them to possibility map
-            // get own letter
+            let letter = if self.config.iterative_letters {
+                LetterService::get_gen_letter(self.generation)
+            } else {
+                LetterService::get_letter(&surrounding_letters)
+            };
+            self.writer(Pixel::new(
+                coords,
+                letter,
+                LetterType::Regular,
+                self.generation,
+                self.config.render_letters,
+                if self.config.colored {
+                    LetterService::get_color(letter)
+                } else {
+                    Color::White
+                },
+            ));
         } else {
             self.for_each_direction(coords, Some(&MapManager::check_surrounding_letters));
         }
