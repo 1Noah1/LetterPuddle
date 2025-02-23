@@ -30,16 +30,22 @@ impl Config {
         println!("1 for letters");
         println!("2 for tiles (recommended)");
         match stdin().read_line(&mut buf) {
-            Ok(_) => match buf.trim().parse::<i32>().unwrap() {
-                001 => config.render_letters = true,
-                002 => config.render_letters = false,
-                _ => println!(
-                    "invalid input: {}, will proceed with standard option",
-                    buf.as_str()
-                ),
+            Ok(_) => {
+                match buf.trim().parse::<i32>() {
+                    Ok(num) => match num {
+                    001 => config.render_letters = true,
+                    002 => config.render_letters = false,
+                    _ => println!(
+                        "invalid input: {}, will proceed with standard option",
+                        buf.as_str()
+                    ),
+                    }
+                    Err(err) => println!("invalid input: {err}, will proceed with standard setting")
+                }
             },
-            _ => println!("read error occured, will proceed with standard setting"),
+            Err(err) => println!("read error occured: {err}, will proceed with standard setting"),
         }
+        println!();
 
         println!("do you want simple or advaned letter/color pattern?");
         println!("");
@@ -47,13 +53,23 @@ impl Config {
         println!("2 for andvanced (recommended)");
         buf.clear();
         match stdin().read_line(&mut buf) {
-            Ok(_) => match buf.trim().parse::<i32>().unwrap() {
-                001 => config.iterative_letters = true,
-                002 => config.iterative_letters = false,
-                _ => println!("invalid number, will proceed with standard option"),
+            Ok(_) => {
+                eprint!("buf: {}", buf);
+                match buf.trim().parse::<i32>() {
+                    Ok(num) => match num {
+                    001 => config.iterative_letters = true,
+                    002 => config.iterative_letters = false,
+                    _ => println!(
+                        "invalid input: {}, will proceed with standard option",
+                        buf.as_str()
+                    ),
+                    }
+                    Err(err) => println!("invalid input: {err}, will proceed with standard setting")
+                }
             },
-            _ => println!("read error occured, will proceed with standard setting"),
+            Err(err) => println!("read error occured: {err}, will proceed with standard setting"),
         }
+       println!(); 
 
         if !config.render_letters {
             config.colored = true;
@@ -65,13 +81,23 @@ impl Config {
         println!("2 for no");
         buf.clear();
         match stdin().read_line(&mut buf) {
-            Ok(_) => match buf.trim().parse::<i32>().unwrap() {
-                001 => config.colored = true,
-                002 => config.colored = false,
-                _ => println!("invalid number, will proceed with standard option"),
+            Ok(_) => {
+                eprint!("buf: {}", buf);
+                match buf.trim().parse::<i32>() {
+                    Ok(num) => match num {
+                    001 => config.colored = true,
+                    002 => config.colored = false,
+                    _ => println!(
+                        "invalid input: {}, will proceed with standard option",
+                        buf.as_str()
+                    ),
+                    }
+                    Err(err) => println!("invalid input: {err}, will proceed with standard setting")
+                }
             },
-            _ => println!("read error occured, will proceed with standard setting"),
+            Err(err) => println!("read error occured: {err}, will proceed with standard setting"),
         }
+       println!(); 
 
         config
     }
