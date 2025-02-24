@@ -52,7 +52,6 @@ impl Config {
         buf.clear();
         match stdin().read_line(&mut buf) {
             Ok(_) => {
-                eprint!("buf: {}", buf);
                 match buf.trim().parse::<i32>() {
                     Ok(num) => match num {
                         001 => config.iterative_letters = true,
@@ -82,7 +81,6 @@ impl Config {
         buf.clear();
         match stdin().read_line(&mut buf) {
             Ok(_) => {
-                eprint!("buf: {}", buf);
                 match buf.trim().parse::<i32>() {
                     Ok(num) => match num {
                         001 => config.colored = true,

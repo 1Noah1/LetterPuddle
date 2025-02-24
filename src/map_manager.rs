@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::dimensions::Dimensions;
 use crate::letter_service::LetterService;
 use crate::letter_type::LetterType;
@@ -14,10 +12,6 @@ pub struct MapManager {
     // is read by map::new()
     //terminal_dimensions: Dimensions,
     last_written_pos: Vec<Coordinate>,
-    // this should save letters, which surrounding letters have already been checked,
-    // after they've been assigned a letter
-    // this prevents unwanted recursion
-    border_pos: HashMap<Coordinate, LetterType>,
     generation: u32,
     config: Config,
 }
@@ -33,7 +27,6 @@ impl MapManager {
         };
         Self {
             last_written_pos: vec![],
-            border_pos: HashMap::new(),
             //terminal_dimensions: terminal_dimensions,
             map: Map::new(terminal_dimensions),
             generation: 0,
@@ -51,8 +44,6 @@ impl MapManager {
             row.iter().for_each(|pixel| {
                 cursor::Goto(pixel.location.x as u16, pixel.location.y as u16);
 
-                // no colors
-                //print!("{}", pixel.char);
 
                 if config.render_letters {
                     // print  letters
@@ -96,76 +87,72 @@ impl MapManager {
     }
 
     fn write_borders(&mut self) {
-        // the border should also be written using the writer
-        // but last time i tried doing that, i fucked up everything
-        // but it still needs to be done
-        // why?
-        // so i can write the border points into an array and know where i can't grow any further
-        let mut i = 0;
+        //tried reducing lines by looping more
+        // i think i barely improved it lol
 
         let right_left = '|';
         let top_bottom = '-';
 
-        //top border
-        while i <= self.map.vec[0].len() - 1 {
-            self.writer(Pixel::new(
-                Coordinate::new(0 as u32, i as u32),
-                top_bottom,
-                LetterType::Border,
-                0,
-                true,
-                Color::White,
-            ));
-            i += 1;
+        //top and bottom border
+        let mut j = 0;
+        while j < 2 {
+            let mut i = 0;
+            while i <= self.map.get_row_len() - 1 {
+                let x;
+                let y;
+                if j < 1 {
+                    x = 0;
+                    y = i;
+                } else {
+                    x = self.map.get_column_len() - 1;
+                    y = i;
+                }
+                self.writer(Pixel::new(
+                    Coordinate::new(x as u32, y as u32),
+                    top_bottom,
+                    LetterType::Border,
+                    0,
+                    true,
+                    Color::White,
+                ));
+                i += 1;
+            }
+            j += 1;
         }
 
-        i = 0;
-        //bottom border
-        while i <= self.map.vec[0].len() - 1 {
-            self.writer(Pixel::new(
-                Coordinate::new((self.map.vec.len() - 1) as u32, i as u32),
-                top_bottom,
-                LetterType::Border,
-                0,
-                true,
-                Color::White,
-            ));
-            i += 1;
-        }
-        i = 0;
-
-        //left border
-        while i <= self.map.vec.len() - 1 {
-            self.writer(Pixel::new(
-                Coordinate::new(i as u32, 0 as u32),
-                right_left,
-                LetterType::Border,
-                0,
-                true,
-                Color::White,
-            ));
-            i += 1;
-        }
-
-        i = 0;
-        //right border
-        while i <= self.map.vec.len() - 1 {
-            self.writer(Pixel::new(
-                Coordinate::new(i as u32, (self.map.vec[0].len() - 1) as u32),
-                right_left,
-                LetterType::Border,
-                0,
-                true,
-                Color::White,
-            ));
-            i += 1;
+        //left and right border
+        let mut j = 0;
+        while j < 2 {
+            let mut i = 0;
+            while i <= self.map.get_column_len() - 1 {
+                let x;
+                let y;
+                if j < 1 {
+                    x = i;
+                    y = 0;
+                } else {
+                    x = i;
+                    y = self.map.get_row_len() - 1;
+                }
+                self.writer(Pixel::new(
+                    Coordinate::new(x as u32, y as u32),
+                    right_left,
+                    LetterType::Border,
+                    0,
+                    true,
+                    Color::White,
+                ));
+                i += 1;
+            }
+            j += 1;
         }
     }
     fn write_middle_letter(&mut self, letter: char) {
-        let x = self.map.vec.len() / 2;
-        let y = self.map.vec[x].len() / 2;
         self.writer(Pixel::new(
-            Coordinate::new(x as u32, y as u32),
+            Coordinate::new(
+                (self.map.get_column_len() / 2) as u32,
+                (self.map.get_row_len() / 2) as u32,
+            ),
             letter,
             LetterType::Regular,
             0,
@@ -195,12 +182,13 @@ impl MapManager {
                 self.check_surrounding_letters(coord);
             }
         } else {
+            // case should not be hit if innit was performed
             //self.write_middle_letter('A');
         }
     }
 
     fn check_surrounding_letters(&mut self, coords: Coordinate) {
-        if self.map.vec[coords.x as usize][coords.y as usize].char == ' ' {
+        if self.map.get_pixel(coords).char == ' ' {
             let mut surrounding_letters: Vec<char> = vec![];
             if let Some(s) = self.for_each_direction(coords, None) {
                 s.iter().for_each(|l| surrounding_letters.push(l.char));
@@ -241,13 +229,16 @@ impl MapManager {
             // horizontal letters
             if i < 2 {
                 let offset_x = coords.x as i32 + offset;
-                match self
-                    .border_pos
-                    .get(&Coordinate::new(offset_x as u32, coords.y))
+                if !self
+                    .map
+                    .is_border_pos(Coordinate::new(offset_x as u32, coords.y))
                 {
-                    None => match f {
+                    match f {
                         Some(f) => {
-                            if self.map.vec[offset_x as usize][coords.y as usize].generation
+                            if self
+                                .map
+                                .get_pixel(Coordinate::new(offset_x as u32, coords.y))
+                                .generation
                                 > self.generation
                             {
                                 f(
@@ -259,22 +250,26 @@ impl MapManager {
                                 )
                             }
                         }
-                        None => values.push(
-                            self.map.vec[(coords.x as i32 + offset) as usize][coords.y as usize],
-                        ),
-                    },
-                    _ => { /*border hit*/ }
+                        None => values.push(self.map.get_pixel(Coordinate::new(
+                            (coords.x as i32 + offset) as u32,
+                            coords.y,
+                        ))),
+                    }
                 }
+
             // vertical  letters
             } else {
                 let offset_y = coords.y as i32 + offset;
-                match self.border_pos.get(&Coordinate {
-                    x: coords.x,
-                    y: (offset_y) as u32,
-                }) {
-                    None => match f {
+                if !self
+                    .map
+                    .is_border_pos(Coordinate::new(coords.x, (offset_y) as u32))
+                {
+                    match f {
                         Some(f) => {
-                            if self.map.vec[coords.x as usize][offset_y as usize].generation
+                            if self
+                                .map
+                                .get_pixel(Coordinate::new(coords.x, offset_y as u32))
+                                .generation
                                 > self.generation
                             {
                                 f(
@@ -286,9 +281,11 @@ impl MapManager {
                                 );
                             }
                         }
-                        None => values.push(self.map.vec[coords.x as usize][offset_y as usize]),
-                    },
-                    _ => { /*border hit*/ }
+                        None => values.push(
+                            self.map
+                                .get_pixel(Coordinate::new(coords.x, offset_y as u32)),
+                        ),
+                    }
                 }
             }
             i += 1;
@@ -305,11 +302,10 @@ impl MapManager {
     }
 
     fn writer(&mut self, pixel: Pixel) {
-        self.map.vec[pixel.location.x as usize][pixel.location.y as usize] = pixel;
-        //thread::sleep(time::Duration::from_millis(0));
+        self.map.set_pixel(pixel);
         match pixel.letter_type {
             LetterType::Border => {
-                self.border_pos.insert(pixel.location, pixel.letter_type);
+                self.map.add_to_border(pixel.location);
             }
             LetterType::Regular => self.last_written_pos.push(pixel.location),
         }
