@@ -35,17 +35,21 @@ impl LetterService {
     }
 
     pub fn get_gen_letter(number: u32) -> char {
+        let mut num = number.clone();
         let mut i = 1;
         let mut letter = ' ';
+        if num > 26 {
+            num = num - 26;
+        }
         for c in 'A'..='Z' {
-            if i == number {
+            if i == num {
                 letter = c;
             }
             i += 1;
         }
         letter
     }
-    pub fn get_colors(letter: char) -> Color {
+    pub fn get_color(letter: char) -> Color {
         match letter {
             'A' => Color::Blue,
             'B' => Color::Cyan,
@@ -53,6 +57,26 @@ impl LetterService {
             'D' => Color::Yellow,
             'E' => Color::Red,
             'F' => Color::Magenta,
+            'G' => Color::Blue,
+            'H' => Color::Cyan,
+            'I' => Color::Green,
+            'J' => Color::Yellow,
+            'K' => Color::Red,
+            'L' => Color::Magenta,
+            'M' => Color::Blue,
+            'N' => Color::Cyan,
+            'O' => Color::Green,
+            'P' => Color::Yellow,
+            'Q' => Color::Red,
+            'R' => Color::Magenta,
+            'S' => Color::Blue,
+            'T' => Color::Cyan,
+            'U' => Color::Green,
+            'V' => Color::Yellow,
+            'W' => Color::Red,
+            'X' => Color::Magenta,
+            'Y' => Color::Blue,
+            'Z' => Color::Cyan,
             _ => Color::White,
         }
     }

@@ -1,3 +1,5 @@
+use colored::Color;
+
 use crate::{coordiante::Coordinate, letter_type::LetterType};
 
 #[derive(Debug, Clone, Copy)]
@@ -6,6 +8,8 @@ pub struct Pixel {
     pub char: char,
     pub letter_type: LetterType,
     pub generation: u32,
+    pub render_letter: bool,
+    pub color: Color,
 }
 
 impl Pixel {
@@ -14,12 +18,18 @@ impl Pixel {
         char: char,
         letter_type: LetterType,
         generation: u32,
+        // <----appearence---->
+        //if false background is rendered with specified color
+        render_letter: bool,
+        color: Color, //<----appearence---->
     ) -> Pixel {
         Pixel {
-            location: location,
-            char: char,
-            letter_type: letter_type,
-            generation: generation,
+            location,
+            char,
+            letter_type,
+            generation,
+            render_letter,
+            color,
         }
     }
 }

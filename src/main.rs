@@ -1,3 +1,4 @@
+pub mod config;
 pub mod coordiante;
 pub mod dimensions;
 pub mod letter_service;
@@ -6,6 +7,7 @@ pub mod map;
 mod map_manager;
 pub mod pixel;
 
+use crate::config::Config;
 use core::time;
 use map_manager::MapManager;
 use std::{
@@ -14,14 +16,15 @@ use std::{
 };
 
 fn main() {
-    let mut manager = MapManager::new();
-
     let mut i = 0;
+    let config = Config::user_preference();
+    let mut manager = MapManager::new(&config);
+
     MapManager::init(&mut manager);
     let start = Instant::now();
     loop {
         let start = Instant::now();
-        MapManager::draw_map(&mut manager.map);
+        MapManager::draw_map(&config, &mut manager.map);
         MapManager::grow(&mut manager);
         thread::sleep(time::Duration::from_millis(50));
         let end = Instant::now();
