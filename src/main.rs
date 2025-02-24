@@ -18,7 +18,6 @@ use std::{
 fn main() {
     let mut i = 0;
     let config = Config::user_preference();
-    println!("config: {:?}", config);
     let mut manager = MapManager::new(&config);
 
     MapManager::init(&mut manager);
