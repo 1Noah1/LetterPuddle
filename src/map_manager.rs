@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use crate::config;
 use crate::dimensions::Dimensions;
 use crate::letter_service::LetterService;
 use crate::letter_type::LetterType;
