@@ -19,8 +19,7 @@ impl MapManager {
     pub fn new(config: &Config) -> MapManager {
         //terminal dimension can be obtained through running termion::terminal_size()
         let terminal_dimensions = Dimensions {
-            // i dont know why, but w:50, 20, definetly works
-            // other ratios will cause bugs, but i haven't investigated the pattern yet
+            // if dimensions dont fit the screen the lines will overflow into the next one (graphic bug)
             width: 90,
             height: 50,
         };
@@ -44,7 +43,6 @@ impl MapManager {
 
         let right_left = '|';
         let top_bottom = '-';
-
         //top and bottom border
         let mut j = 0;
         while j < 2 {
