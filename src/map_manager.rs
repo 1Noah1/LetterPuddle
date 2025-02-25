@@ -5,8 +5,7 @@ use crate::map::Map;
 use crate::pixel::Pixel;
 use crate::{config::Config, coordiante::Coordinate};
 
-use colored::{Color, Colorize};
-use termion::cursor;
+use colored::Color;
 pub struct MapManager {
     pub map: Map,
     // is read by map::new()
@@ -37,53 +36,6 @@ impl MapManager {
     pub fn init(&mut self) {
         self.write_borders();
         self.write_middle_letter('A')
-    }
-
-    pub fn draw_map(config: &Config, map: &Map) {
-        map.vec.iter().for_each(|row| {
-            row.iter().for_each(|pixel| {
-                cursor::Goto(pixel.location.x as u16, pixel.location.y as u16);
-
-
-                if config.render_letters {
-                    // print  letters
-                    match pixel.color {
-                        Color::Blue => print!("{}", pixel.char.to_string().blue()),
-                        Color::Red => print!("{}", pixel.char.to_string().red()),
-                        Color::Magenta => print!("{}", pixel.char.to_string().magenta()),
-                        Color::Green => print!("{}", pixel.char.to_string().green()),
-                        Color::Cyan => print!("{}", pixel.char.to_string().cyan()),
-                        Color::Yellow => print!("{}", pixel.char.to_string().yellow()),
-                        _ => print!("{}", pixel.char.to_string().white()),
-                    }
-                } else {
-                    // print color only
-
-                    match pixel.color {
-                        Color::Blue => print!("{}", " ".to_string().on_blue()),
-                        Color::Red => print!("{}", " ".to_string().on_red()),
-                        Color::Magenta => print!("{}", " ".to_string().on_magenta()),
-                        Color::Green => print!("{}", " ".to_string().on_green()),
-                        Color::Cyan => print!("{}", " ".to_string().on_cyan()),
-                        Color::Yellow => print!("{}", " ".to_string().on_yellow()),
-                        _ => print!("{}", pixel.char),
-                    }
-                }
-
-                // one symbol draw
-                // let symbol = '#';
-                // match LetterService::get_colors(pixel.char) {
-                // Color::Blue => print!("{}", symbol.to_string().blue()),
-                // Color::Red => print!("{}", symbol.to_string().red()),
-                // Color::Magenta => print!("{}", symbol.to_string().magenta()),
-                // Color::Green => print!("{}", symbol.to_string().green()),
-                // Color::Cyan => print!("{}", symbol.to_string().cyan()),
-                // Color::Yellow => print!("{}", symbol.to_string().yellow()),
-                // _ => print!("{}", pixel.char)
-                // }
-            });
-            println!();
-        });
     }
 
     fn write_borders(&mut self) {

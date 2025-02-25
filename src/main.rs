@@ -6,10 +6,12 @@ pub mod letter_type;
 pub mod map;
 mod map_manager;
 pub mod pixel;
+pub mod render;
 
 use crate::config::Config;
 use core::time;
 use map_manager::MapManager;
+use render::Render;
 use std::{
     thread::{self},
     time::Instant,
@@ -24,7 +26,7 @@ fn main() {
     let start = Instant::now();
     loop {
         let start = Instant::now();
-        MapManager::draw_map(&config, &mut manager.map);
+        Render::draw_map(&config, &mut manager.map);
         MapManager::grow(&mut manager);
         thread::sleep(time::Duration::from_millis(50));
         let end = Instant::now();
