@@ -2,7 +2,7 @@ use colored::Color;
 
 use crate::{coordiante::Coordinate, letter_type::LetterType};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Pixel {
     pub location: Coordinate,
     pub char: char,
