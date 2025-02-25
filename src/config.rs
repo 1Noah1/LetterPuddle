@@ -51,22 +51,19 @@ impl Config {
         println!("2 for andvanced (recommended)");
         buf.clear();
         match stdin().read_line(&mut buf) {
-            Ok(_) => {
-                eprint!("buf: {}", buf);
-                match buf.trim().parse::<i32>() {
-                    Ok(num) => match num {
-                        001 => config.iterative_letters = true,
-                        002 => config.iterative_letters = false,
-                        _ => println!(
-                            "invalid input: {}, will proceed with standard option",
-                            buf.as_str()
-                        ),
-                    },
-                    Err(err) => {
-                        println!("invalid input: {err}, will proceed with standard setting")
-                    }
+            Ok(_) => match buf.trim().parse::<i32>() {
+                Ok(num) => match num {
+                    001 => config.iterative_letters = true,
+                    002 => config.iterative_letters = false,
+                    _ => println!(
+                        "invalid input: {}, will proceed with standard option",
+                        buf.as_str()
+                    ),
+                },
+                Err(err) => {
+                    println!("invalid input: {err}, will proceed with standard setting")
                 }
-            }
+            },
             Err(err) => println!("read error occured: {err}, will proceed with standard setting"),
         }
         println!();
@@ -81,22 +78,19 @@ impl Config {
         println!("2 for no");
         buf.clear();
         match stdin().read_line(&mut buf) {
-            Ok(_) => {
-                eprint!("buf: {}", buf);
-                match buf.trim().parse::<i32>() {
-                    Ok(num) => match num {
-                        001 => config.colored = true,
-                        002 => config.colored = false,
-                        _ => println!(
-                            "invalid input: {}, will proceed with standard option",
-                            buf.as_str()
-                        ),
-                    },
-                    Err(err) => {
-                        println!("invalid input: {err}, will proceed with standard setting")
-                    }
+            Ok(_) => match buf.trim().parse::<i32>() {
+                Ok(num) => match num {
+                    001 => config.colored = true,
+                    002 => config.colored = false,
+                    _ => println!(
+                        "invalid input: {}, will proceed with standard option",
+                        buf.as_str()
+                    ),
+                },
+                Err(err) => {
+                    println!("invalid input: {err}, will proceed with standard setting")
                 }
-            }
+            },
             Err(err) => println!("read error occured: {err}, will proceed with standard setting"),
         }
         println!();
