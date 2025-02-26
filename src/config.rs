@@ -103,10 +103,10 @@ mod tests {
     use crate::config::Config;
 
     #[test]
-    fn new(){
+    fn new() {
         assert_eq!(
             Config::new(),
-            Config{
+            Config {
                 render_letters: true,
                 iterative_letters: false,
                 colored: true

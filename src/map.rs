@@ -75,12 +75,14 @@ impl Map {
 mod tests {
     use colored::Color;
 
-
     use super::*;
 
     #[test]
-    fn new(){
-        let dimensions = Dimensions{width:90, height: 50 };
+    fn new() {
+        let dimensions = Dimensions {
+            width: 90,
+            height: 50,
+        };
         let map = Map::new(dimensions);
 
         //<---- create empty 2Dvec ---->
@@ -114,36 +116,54 @@ mod tests {
         //<---- assign coordinates ---->
         let border_pos = HashMap::new();
 
-        assert_eq!(map, Map{vec: vec, border_pos: border_pos})
+        assert_eq!(
+            map,
+            Map {
+                vec: vec,
+                border_pos: border_pos
+            }
+        )
     }
 
     #[test]
-    fn get_row_len(){
-        let dimensions = Dimensions{width:90, height: 50 };
+    fn get_row_len() {
+        let dimensions = Dimensions {
+            width: 90,
+            height: 50,
+        };
         let map = Map::new(dimensions);
 
         assert_eq!(map.get_row_len(), map.vec[0].len());
     }
 
     #[test]
-    fn get_column_len(){
-        let dimensions = Dimensions{width:90, height: 50 };
+    fn get_column_len() {
+        let dimensions = Dimensions {
+            width: 90,
+            height: 50,
+        };
         let map = Map::new(dimensions);
 
         assert_eq!(map.get_column_len(), map.vec.len());
     }
 
     #[test]
-    fn get_pixel(){
-        let dimensions = Dimensions{width:90, height: 50 };
+    fn get_pixel() {
+        let dimensions = Dimensions {
+            width: 90,
+            height: 50,
+        };
         let map = Map::new(dimensions);
 
-        assert_eq!(map.get_pixel(Coordinate{x: 10, y: 10}), map.vec[10][10]);
+        assert_eq!(map.get_pixel(Coordinate { x: 10, y: 10 }), map.vec[10][10]);
     }
 
     #[test]
-    fn set_pixel(){
-        let dimensions = Dimensions{width:90, height: 50 };
+    fn set_pixel() {
+        let dimensions = Dimensions {
+            width: 90,
+            height: 50,
+        };
         let mut map = Map::new(dimensions);
 
         let new_pixel_pos = Coordinate::new(15, 15);
@@ -153,7 +173,7 @@ mod tests {
             LetterType::Regular,
             1000,
             true,
-            Color::Blue
+            Color::Blue,
         );
 
         map.set_pixel(pixel);
@@ -161,12 +181,15 @@ mod tests {
     }
 
     #[test]
-    fn border_pos(){
-        let dimensions = Dimensions{width:90, height: 50 };
+    fn border_pos() {
+        let dimensions = Dimensions {
+            width: 90,
+            height: 50,
+        };
         let mut map = Map::new(dimensions);
-        let is_border_coord = Coordinate::new(15,15);
-        let is_not_border_coord = Coordinate::new(0,0);
-        
+        let is_border_coord = Coordinate::new(15, 15);
+        let is_not_border_coord = Coordinate::new(0, 0);
+
         map.add_to_border(is_border_coord);
         assert_eq!(map.is_border_pos(is_border_coord), true);
         assert_eq!(map.is_border_pos(is_not_border_coord), false);

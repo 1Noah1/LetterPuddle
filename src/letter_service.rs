@@ -83,11 +83,11 @@ impl LetterService {
 }
 
 #[cfg(test)]
-mod tests{
+mod tests {
 
     use super::*;
     #[test]
-    fn get_gen_letter(){
+    fn get_gen_letter() {
         let mut i = 1;
         for letter in 'A'..'Z' {
             let gen_letter = LetterService::get_gen_letter(i);
@@ -95,5 +95,4 @@ mod tests{
             i += 1;
         }
     }
-
 }

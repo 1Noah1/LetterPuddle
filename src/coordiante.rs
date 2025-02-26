@@ -11,12 +11,9 @@ impl Coordinate {
 
 #[cfg(test)]
 mod tests {
-use super::*;
+    use super::*;
     #[test]
     fn new() {
-        assert_eq!(
-            Coordinate::new(10,10),
-            Coordinate{x: 10, y: 10}
-        )
+        assert_eq!(Coordinate::new(10, 10), Coordinate { x: 10, y: 10 })
     }
 }
