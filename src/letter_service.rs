@@ -90,7 +90,7 @@ mod tests{
     fn get_gen_letter(){
         let mut i = 1;
         for letter in 'A'..'Z' {
-            let gen_letter =LetterService::get_gen_letter(i);
+            let gen_letter = LetterService::get_gen_letter(i);
             assert_eq!(gen_letter, letter);
             i += 1;
         }

@@ -1,6 +1,6 @@
 use std::io::stdin;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Config {
     // if false, the random noise letter pattern will be used
     // if true, letters will just be A,B,C,D,E.....
@@ -96,5 +96,21 @@ impl Config {
         println!();
 
         config
+    }
+}
+
+mod tests {
+    use crate::config::Config;
+
+    #[test]
+    fn new(){
+        assert_eq!(
+            Config::new(),
+            Config{
+                render_letters: true,
+                iterative_letters: false,
+                colored: true
+            }
+        )
     }
 }
