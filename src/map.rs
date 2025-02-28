@@ -8,7 +8,6 @@ use crate::pixel::Pixel;
 #[derive(PartialEq, Eq, Debug)]
 pub struct Map {
     pub vec: Vec<Vec<Pixel>>,
-    border_pos: HashMap<Coordinate, LetterType>,
 }
 impl Map {
     pub fn new(dimensions: Dimensions) -> Map {
@@ -40,7 +39,6 @@ impl Map {
 
         Map {
             vec: vec,
-            border_pos: HashMap::new(),
         }
     }
 
@@ -59,13 +57,14 @@ impl Map {
         self.vec[new_pixel.location.x as usize][new_pixel.location.y as usize] = new_pixel
     }
     pub fn is_border_pos(&self, location: Coordinate) -> bool {
-        match self.border_pos.get(&location) {
-            Some(_) => true,
-            None => false,
+        match self.get_pixel(location).letter_type {
+            LetterType::Border => true,
+            LetterType::Regular => false,
         }
+        
     }
     pub fn add_to_border(&mut self, location: Coordinate) {
-        self.border_pos.insert(location, LetterType::Border);
+        self.get_pixel(location).letter_type = LetterType::Border;
     }
 }
 
@@ -110,13 +109,11 @@ mod tests {
             i += 1;
         }
         //<---- assign coordinates ---->
-        let border_pos = HashMap::new();
-
+        
         assert_eq!(
             map,
             Map {
                 vec: vec,
-                border_pos: border_pos
             }
         )
     }
