@@ -5,7 +5,6 @@ use crate::map::Map;
 use crate::pixel::Pixel;
 use crate::{config::Config, coordiante::Coordinate};
 
-use colored::Color;
 pub struct MapManager {
     pub map: Map,
     // is read by map::new()

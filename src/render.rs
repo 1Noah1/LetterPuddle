@@ -15,7 +15,8 @@ impl Render {
 
                 if config.render_letters {
                     // print  letters
-                    match LetterService::get_color(pixel.char)  {
+                    if config.colored{
+                        match LetterService::get_color(pixel.char)  {
                         Color::Blue => print!("{}", pixel.char.to_string().blue()),
                         Color::Red => print!("{}", pixel.char.to_string().red()),
                         Color::Magenta => print!("{}", pixel.char.to_string().magenta()),
@@ -23,6 +24,8 @@ impl Render {
                         Color::Cyan => print!("{}", pixel.char.to_string().cyan()),
                         Color::Yellow => print!("{}", pixel.char.to_string().yellow()),
                         _ => print!("{}", pixel.char.to_string().white()),
+                    }}else {
+                        print!("{}", pixel.char.to_string().white())
                     }
                 } else {
                     // print color only

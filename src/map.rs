@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::coordiante::Coordinate;
 use crate::dimensions::Dimensions;
 use crate::letter_type::LetterType;
