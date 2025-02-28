@@ -187,9 +187,10 @@ impl MapManager {
                             // i think i should use references instead
                             // but that causes a weird error i dont understand yet
                             *self.map.get_pixel(Coordinate::new(
-                            (coords.x as i32 + offset) as u32,
-                            coords.y,
-                        ))),
+                                (coords.x as i32 + offset) as u32,
+                                coords.y,
+                            )),
+                        ),
                     }
                 }
 
@@ -220,7 +221,8 @@ impl MapManager {
                         None => values.push(
                             // i think i should use references instead
                             // but that causes a weird error i dont understand yet
-                            *self.map
+                            *self
+                                .map
                                 .get_pixel(Coordinate::new(coords.x, offset_y as u32)),
                         ),
                     }
@@ -256,15 +258,8 @@ mod tests {
     use crate::config::Config;
 
     #[test]
-    fn test() {
+    fn grow() {
         let config = Config::new(true, true, true);
-        grow(config);
-
-        // non iterative is random, so i cant test that
-        // all other options won't be tested since, they're render options
-    }
-
-    fn grow(config: Config) {
         let mut map_manager = MapManager::new(&config);
         let dimensions = Dimensions::new(90, 50);
 
@@ -283,10 +278,13 @@ mod tests {
             map_manager.grow();
             i += 1;
         }
-        for (mut i,letter) in ('A' as u8..='Z' as u8).enumerate()  {
+        for (mut i, letter) in ('A' as u8..='Z' as u8).enumerate() {
             //initial offset
             i += 1;
-            let letter_in_map = map_manager.map.get_pixel(Coordinate::new(middle_letter_pos.x ,middle_letter_pos.y - i as u32));
+            let letter_in_map = map_manager.map.get_pixel(Coordinate::new(
+                middle_letter_pos.x,
+                middle_letter_pos.y - i as u32,
+            ));
             if letter_in_map.char != letter as char {
                 panic!("iterative letter map is broken")
             }
