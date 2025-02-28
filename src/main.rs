@@ -7,6 +7,7 @@ pub mod map;
 mod map_manager;
 pub mod pixel;
 pub mod render;
+pub mod render_config;
 
 use crate::config::Config;
 use core::time;
@@ -27,7 +28,7 @@ fn main() {
 
     loop {
         let start = Instant::now();
-        Render::draw_map(&config, &mut manager.map);
+        Render::draw_map(&config.render_config, &mut manager.map);
         MapManager::grow(&mut manager);
         thread::sleep(time::Duration::from_millis(50));
         let end = Instant::now();

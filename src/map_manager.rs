@@ -183,7 +183,10 @@ impl MapManager {
                                 )
                             }
                         }
-                        None => values.push(self.map.get_pixel(Coordinate::new(
+                        None => values.push(
+                            // i think i should use references instead
+                            // but that causes a weird error i dont understand yet
+                            *self.map.get_pixel(Coordinate::new(
                             (coords.x as i32 + offset) as u32,
                             coords.y,
                         ))),
@@ -215,7 +218,9 @@ impl MapManager {
                             }
                         }
                         None => values.push(
-                            self.map
+                            // i think i should use references instead
+                            // but that causes a weird error i dont understand yet
+                            *self.map
                                 .get_pixel(Coordinate::new(coords.x, offset_y as u32)),
                         ),
                     }
@@ -247,55 +252,44 @@ impl MapManager {
 
 #[cfg(test)]
 mod tests {
-    use crate::config::Config;
-
     use super::*;
+    use crate::config::Config;
 
     #[test]
     fn test() {
         let config = Config::new(true, true, true);
         grow(config);
 
-        let config = Config::new(false, true, true);
-        grow(config);
-
-        let config = Config::new(true, true, false);
-        grow(config);        
-
-        let config = Config::new(false, true, false);
-        grow(config);        
-
-        // render_letters is always true since it is an render option and doesn't matter
-
-
-
+        // non iterative is random, so i cant test that
+        // all other options won't be tested since, they're render options
     }
+
     fn grow(config: Config) {
-        println!("config: {:?}", config);
         let mut map_manager = MapManager::new(&config);
-        let dimensions = Dimensions::new(90,50);
-        let mut map = Map::new(dimensions);
+        let dimensions = Dimensions::new(90, 50);
 
         map_manager.init();
 
-        // TODO: check if borders haven been written correctly
-
-        let middle_letter_pos = Coordinate::new(
-                (dimensions.height) / 2,
-                 (dimensions.width) / 2);
+        let middle_letter_pos = Coordinate::new((dimensions.height) / 2, (dimensions.width) / 2);
 
         if map_manager.map.get_pixel(middle_letter_pos).char == 'A' {
             println!("correct_middle letter");
-        }else {
+        } else {
             panic!("middle_letter is not 'A'")
         }
-
 
         let mut i = 0;
         while i <= 40 {
             map_manager.grow();
-            i+=1;
+            i += 1;
         }
-    println!("{:?}", map_manager.map.vec)
+        for (mut i,letter) in ('A' as u8..='Z' as u8).enumerate()  {
+            //initial offset
+            i += 1;
+            let letter_in_map = map_manager.map.get_pixel(Coordinate::new(middle_letter_pos.x ,middle_letter_pos.y - i as u32));
+            if letter_in_map.char != letter as char {
+                panic!("iterative letter map is broken")
+            }
+        }
     }
 }

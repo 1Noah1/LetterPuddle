@@ -5,12 +5,7 @@ pub struct Dimensions {
 }
 
 impl Dimensions {
-    pub fn new(width: u32, height: u32) -> Dimensions{
-        Dimensions{
-            width,
-            height  
-        }
-
+    pub fn new(width: u32, height: u32) -> Dimensions {
+        Dimensions { width, height }
     }
-    
 }
