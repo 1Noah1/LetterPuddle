@@ -14,7 +14,15 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new() -> Config {
+    pub fn  new(iterative_letters: bool, render_letters: bool, colored: bool) -> Config{
+        Config {
+            iterative_letters,
+            render_letters,
+            colored,
+        }
+
+    }
+    pub fn new_std() -> Config {
         Config {
             iterative_letters: false,
             render_letters: true,
@@ -22,8 +30,8 @@ impl Config {
         }
     }
 
-    pub fn user_preference() -> Config {
-        let mut config = Config::new();
+    pub fn config_from_user_preference() -> Config {
+        let mut config = Config::new_std();
         let mut buf = "".to_string();
 
         println!("do you want to render letters or colored tiles?");
@@ -105,9 +113,9 @@ mod tests {
     use crate::config::Config;
 
     #[test]
-    fn new() {
+    fn new_std() {
         assert_eq!(
-            Config::new(),
+            Config::new_std(),
             Config {
                 render_letters: true,
                 iterative_letters: false,

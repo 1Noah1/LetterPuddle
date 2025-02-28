@@ -19,8 +19,6 @@ impl Map {
                     ' ',
                     LetterType::Regular,
                     1000,
-                    true,
-                    colored::Color::White
                 );
                 dimensions.width as usize
             ];
@@ -93,8 +91,6 @@ mod tests {
                     ' ',
                     LetterType::Regular,
                     1000,
-                    true,
-                    colored::Color::White
                 );
                 dimensions.width as usize
             ];
@@ -172,8 +168,6 @@ mod tests {
             'A',
             LetterType::Regular,
             1000,
-            true,
-            Color::Blue,
         );
 
         map.set_pixel(pixel);

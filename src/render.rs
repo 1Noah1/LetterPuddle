@@ -1,6 +1,7 @@
 use colored::{Color, Colorize};
 use termion::cursor;
 
+use crate::letter_service::LetterService;
 use crate::map::Map;
 use crate::Config;
 
@@ -14,7 +15,7 @@ impl Render {
 
                 if config.render_letters {
                     // print  letters
-                    match pixel.color {
+                    match LetterService::get_color(pixel.char)  {
                         Color::Blue => print!("{}", pixel.char.to_string().blue()),
                         Color::Red => print!("{}", pixel.char.to_string().red()),
                         Color::Magenta => print!("{}", pixel.char.to_string().magenta()),
@@ -25,8 +26,7 @@ impl Render {
                     }
                 } else {
                     // print color only
-
-                    match pixel.color {
+                    match LetterService::get_color(pixel.char) {
                         Color::Blue => print!("{}", " ".to_string().on_blue()),
                         Color::Red => print!("{}", " ".to_string().on_red()),
                         Color::Magenta => print!("{}", " ".to_string().on_magenta()),

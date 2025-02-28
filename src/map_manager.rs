@@ -62,8 +62,6 @@ impl MapManager {
                     top_bottom,
                     LetterType::Border,
                     0,
-                    true,
-                    Color::White,
                 ));
                 i += 1;
             }
@@ -89,8 +87,6 @@ impl MapManager {
                     right_left,
                     LetterType::Border,
                     0,
-                    true,
-                    Color::White,
                 ));
                 i += 1;
             }
@@ -106,12 +102,6 @@ impl MapManager {
             letter,
             LetterType::Regular,
             0,
-            self.config.render_letters,
-            if self.config.colored {
-                LetterService::get_color(letter)
-            } else {
-                Color::White
-            },
         ));
     }
 
@@ -153,12 +143,6 @@ impl MapManager {
                 letter,
                 LetterType::Regular,
                 self.generation,
-                self.config.render_letters,
-                if self.config.colored {
-                    LetterService::get_color(letter)
-                } else {
-                    Color::White
-                },
             ));
         } else {
             self.for_each_direction(coords, Some(&MapManager::check_surrounding_letters));
@@ -259,5 +243,60 @@ impl MapManager {
             }
             LetterType::Regular => self.last_written_pos.push(pixel.location),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::config::Config;
+
+    use super::*;
+
+    #[test]
+    fn test() {
+        let config = Config::new(true, true, true);
+        grow(config);
+
+        let config = Config::new(false, true, true);
+        grow(config);
+
+        let config = Config::new(true, true, false);
+        grow(config);        
+
+        let config = Config::new(false, true, false);
+        grow(config);        
+
+        // render_letters is always true since it is an render option and doesn't matter
+
+
+
+    }
+    fn grow(config: Config) {
+        println!("config: {:?}", config);
+        let mut map_manager = MapManager::new(&config);
+        let dimensions = Dimensions::new(90,50);
+        let mut map = Map::new(dimensions);
+
+        map_manager.init();
+
+        // TODO: check if borders haven been written correctly
+
+        let middle_letter_pos = Coordinate::new(
+                (dimensions.height) / 2,
+                 (dimensions.width) / 2);
+
+        if map_manager.map.get_pixel(middle_letter_pos).char == 'A' {
+            println!("correct_middle letter");
+        }else {
+            panic!("middle_letter is not 'A'")
+        }
+
+
+        let mut i = 0;
+        while i <= 40 {
+            map_manager.grow();
+            i+=1;
+        }
+    println!("{:?}", map_manager.map.vec)
     }
 }

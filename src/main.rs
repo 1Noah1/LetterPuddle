@@ -19,11 +19,12 @@ use std::{
 
 fn main() {
     let mut i = 0;
-    let config = Config::user_preference();
+    let config = Config::config_from_user_preference();
     let mut manager = MapManager::new(&config);
 
     MapManager::init(&mut manager);
     let start = Instant::now();
+
     loop {
         let start = Instant::now();
         Render::draw_map(&config, &mut manager.map);
@@ -36,6 +37,7 @@ fn main() {
         }
         i += 1;
     }
+
     let end = Instant::now();
-    print!("total_time: {:?}", end.duration_since(start))
+    print!("total_time: {:?}", end.duration_since(start));
 }
