@@ -1,29 +1,31 @@
+use crate::render_config::RenderConfig;
 use std::io::stdin;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Config {
     // if false, the random noise letter pattern will be used
     // if true, letters will just be A,B,C,D,E.....
     pub iterative_letters: bool,
-    // if false, no letters will be printed (' ')
-    // things are only visible if the colored is true,
-    // so the background tiles are rendered with color
-    pub render_letters: bool,
-    // letters or tiles will receive color, or not
-    pub colored: bool,
+
+    pub render_config: RenderConfig,
 }
 
 impl Config {
-    pub fn new() -> Config {
+    pub fn new(iterative_letters: bool, render_letters: bool, colored: bool) -> Config {
+        Config {
+            iterative_letters,
+            render_config: RenderConfig::new(colored, render_letters),
+        }
+    }
+    pub fn new_std() -> Config {
         Config {
             iterative_letters: false,
-            render_letters: true,
-            colored: true,
+            render_config: RenderConfig::new(true, true),
         }
     }
 
-    pub fn user_preference() -> Config {
-        let mut config = Config::new();
+    pub fn config_from_user_preference() -> Config {
+        let mut config = Config::new_std();
         let mut buf = "".to_string();
 
         println!("do you want to render letters or colored tiles?");
@@ -32,8 +34,8 @@ impl Config {
         match stdin().read_line(&mut buf) {
             Ok(_) => match buf.trim().parse::<i32>() {
                 Ok(num) => match num {
-                    001 => config.render_letters = true,
-                    002 => config.render_letters = false,
+                    001 => config.render_config.render_letters = true,
+                    002 => config.render_config.render_letters = false,
                     _ => println!(
                         "invalid input: {}, will proceed with standard option",
                         buf.as_str()
@@ -68,8 +70,8 @@ impl Config {
         }
         println!();
 
-        if !config.render_letters {
-            config.colored = true;
+        if !config.render_config.render_letters {
+            config.render_config.colored = true;
             return config;
         }
 
@@ -80,8 +82,8 @@ impl Config {
         match stdin().read_line(&mut buf) {
             Ok(_) => match buf.trim().parse::<i32>() {
                 Ok(num) => match num {
-                    001 => config.colored = true,
-                    002 => config.colored = false,
+                    001 => config.render_config.colored = true,
+                    002 => config.render_config.colored = false,
                     _ => println!(
                         "invalid input: {}, will proceed with standard option",
                         buf.as_str()
@@ -96,5 +98,22 @@ impl Config {
         println!();
 
         config
+    }
+}
+
+mod tests {
+    // it's needed for the test idk why linter calls it uknown
+    #![allow(unused_imports)]
+    use crate::{render_config::RenderConfig, *};
+
+    #[test]
+    fn new_std() {
+        assert_eq!(
+            Config::new_std(),
+            Config {
+                iterative_letters: false,
+                render_config: RenderConfig::new(true, true)
+            }
+        )
     }
 }

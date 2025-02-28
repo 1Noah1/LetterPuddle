@@ -8,3 +8,12 @@ impl Coordinate {
         Coordinate { x: x, y: y }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn new() {
+        assert_eq!(Coordinate::new(10, 10), Coordinate { x: 10, y: 10 })
+    }
+}

@@ -5,7 +5,6 @@ use crate::map::Map;
 use crate::pixel::Pixel;
 use crate::{config::Config, coordiante::Coordinate};
 
-use colored::Color;
 pub struct MapManager {
     pub map: Map,
     // is read by map::new()
@@ -62,8 +61,6 @@ impl MapManager {
                     top_bottom,
                     LetterType::Border,
                     0,
-                    true,
-                    Color::White,
                 ));
                 i += 1;
             }
@@ -89,8 +86,6 @@ impl MapManager {
                     right_left,
                     LetterType::Border,
                     0,
-                    true,
-                    Color::White,
                 ));
                 i += 1;
             }
@@ -106,12 +101,6 @@ impl MapManager {
             letter,
             LetterType::Regular,
             0,
-            self.config.render_letters,
-            if self.config.colored {
-                LetterService::get_color(letter)
-            } else {
-                Color::White
-            },
         ));
     }
 
@@ -153,12 +142,6 @@ impl MapManager {
                 letter,
                 LetterType::Regular,
                 self.generation,
-                self.config.render_letters,
-                if self.config.colored {
-                    LetterService::get_color(letter)
-                } else {
-                    Color::White
-                },
             ));
         } else {
             self.for_each_direction(coords, Some(&MapManager::check_surrounding_letters));
@@ -200,10 +183,14 @@ impl MapManager {
                                 )
                             }
                         }
-                        None => values.push(self.map.get_pixel(Coordinate::new(
-                            (coords.x as i32 + offset) as u32,
-                            coords.y,
-                        ))),
+                        None => values.push(
+                            // i think i should use references instead
+                            // but that causes a weird error i dont understand yet
+                            *self.map.get_pixel(Coordinate::new(
+                                (coords.x as i32 + offset) as u32,
+                                coords.y,
+                            )),
+                        ),
                     }
                 }
 
@@ -232,7 +219,10 @@ impl MapManager {
                             }
                         }
                         None => values.push(
-                            self.map
+                            // i think i should use references instead
+                            // but that causes a weird error i dont understand yet
+                            *self
+                                .map
                                 .get_pixel(Coordinate::new(coords.x, offset_y as u32)),
                         ),
                     }
@@ -258,6 +248,46 @@ impl MapManager {
                 self.map.add_to_border(pixel.location);
             }
             LetterType::Regular => self.last_written_pos.push(pixel.location),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::Config;
+
+    #[test]
+    fn grow() {
+        let config = Config::new(true, true, true);
+        let mut map_manager = MapManager::new(&config);
+        let dimensions = Dimensions::new(90, 50);
+
+        map_manager.init();
+
+        let middle_letter_pos = Coordinate::new((dimensions.height) / 2, (dimensions.width) / 2);
+
+        if map_manager.map.get_pixel(middle_letter_pos).char == 'A' {
+            println!("correct_middle letter");
+        } else {
+            panic!("middle_letter is not 'A'")
+        }
+
+        let mut i = 0;
+        while i <= 40 {
+            map_manager.grow();
+            i += 1;
+        }
+        for (mut i, letter) in ('A' as u8..='Z' as u8).enumerate() {
+            //initial offset
+            i += 1;
+            let letter_in_map = map_manager.map.get_pixel(Coordinate::new(
+                middle_letter_pos.x,
+                middle_letter_pos.y - i as u32,
+            ));
+            if letter_in_map.char != letter as char {
+                panic!("iterative letter map is broken")
+            }
         }
     }
 }
