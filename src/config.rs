@@ -100,6 +100,8 @@ impl Config {
 }
 
 mod tests {
+    // it's needed for the test idk why linter calls it uknown
+    #![allow(unused_imports)]
     use crate::config::Config;
 
     #[test]
