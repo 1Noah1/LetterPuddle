@@ -24,7 +24,11 @@ impl TerminalRenderEngine {
 
 impl RenderEngine for TerminalRenderEngine {
     fn render(&mut self) {
-        if let map = self.frames.pop_front();
+        match self.frames.pop_front() {
+            Some(frame) => let map = frame,
+            None => return,
+        }
+        let map = self.frames.pop_front();
         map.vec.iter().for_each(|row| {
             row.iter().for_each(|pixel| {
                 cursor::Goto(pixel.location.x as u16, pixel.location.y as u16);
