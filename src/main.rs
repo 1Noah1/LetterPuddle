@@ -7,12 +7,14 @@ pub mod map;
 mod map_manager;
 pub mod pixel;
 pub mod render;
+pub mod renderer;
 pub mod render_config;
 
 use crate::config::Config;
 use core::time;
 use map_manager::MapManager;
 use render::Render;
+use renderer::Renderer;
 use std::{
     thread::{self},
     time::Instant,
@@ -28,7 +30,7 @@ fn main() {
 
     loop {
         let start = Instant::now();
-        Render::draw_map(&config.render_config, &mut manager.map);
+        Renderer::render(&config.render_config, &mut manager.map);
         MapManager::grow(&mut manager);
         thread::sleep(time::Duration::from_millis(50));
         let end = Instant::now();
