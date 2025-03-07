@@ -1,15 +1,30 @@
+use std::collections::VecDeque;
+
 use colored::{Color, Colorize};
 use termion::cursor;
 
 use crate::letter_service::LetterService;
 use crate::map::Map;
-use crate::render::Render;
 use crate::render_config::RenderConfig;
+use crate::render_engine::RenderEngine;
 
-pub struct Renderer;
+pub struct TerminalRenderEngine {
+    config: RenderConfig,
+    frames: VecDeque<Map>,
+}
 
-impl Render for Renderer {
-    fn render(config: &RenderConfig, map: &Map) {
+impl TerminalRenderEngine {
+    pub fn  new(config: RenderConfig) -> TerminalRenderEngine {
+        TerminalRenderEngine {
+            config: config,
+            frames: VecDeque::new()
+        }
+    }
+}
+
+impl RenderEngine for TerminalRenderEngine {
+    fn render(&mut self) {
+        if let map = self.frames.pop_front();
         map.vec.iter().for_each(|row| {
             row.iter().for_each(|pixel| {
                 cursor::Goto(pixel.location.x as u16, pixel.location.y as u16);
@@ -56,5 +71,11 @@ impl Render for Renderer {
             });
             println!();
         });
+        // delete rendered Frame
+
     }
+    fn add_frame(&mut self,frame: &Map){
+        self.frames.push_back(frame);
+    }
+
 }
