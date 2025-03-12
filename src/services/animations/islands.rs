@@ -1,107 +1,30 @@
-use crate::dimensions::Dimensions;
-use crate::letter_service::LetterService;
-use crate::letter_type::LetterType;
-use crate::map::Map;
-use crate::pixel::Pixel;
-use crate::{config::Config, coordiante::Coordinate};
+use crate::{map::map::Map, pixel::{coordiante::Coordinate, letter_type::LetterType, pixel::Pixel}};
 
-pub struct MapManager {
-    pub map: Map,
-    // is read by map::new()
-    //terminal_dimensions: Dimensions,
-    last_written_pos: Vec<Coordinate>,
-    generation: u32,
-    config: Config,
+use super::grow::Grow;
+
+struct Islands {}
+
+impl Grow for Islands {
+    fn grow(map: &mut Map){
+
+    }
 }
-
-impl MapManager {
-    pub fn new(config: &Config) -> MapManager {
-        //terminal dimension can be obtained through running termion::terminal_size()
-        let terminal_dimensions = Dimensions {
-            // if dimensions dont fit the screen the lines will overflow into the next one (graphic bug)
-            width: 90,
-            height: 50,
-        };
-        Self {
-            last_written_pos: vec![],
-            //terminal_dimensions: terminal_dimensions,
-            map: Map::new(terminal_dimensions),
-            generation: 0,
-            config: config.clone(),
-        }
+impl Islands {
+    fn new() -> Islands{
+        Islands {}
     }
 
-    pub fn init(&mut self) {
-        self.write_borders();
-        self.write_middle_letter('A')
-    }
 
-    fn write_borders(&mut self) {
-        //tried reducing lines by looping more
-        // i think i barely improved it lol
-
-        let right_left = '|';
-        let top_bottom = '-';
-        //top and bottom border
-        let mut j = 0;
-        while j < 2 {
-            let mut i = 0;
-            while i <= self.map.get_row_len() - 1 {
-                let x;
-                let y;
-                if j < 1 {
-                    x = 0;
-                    y = i;
-                } else {
-                    x = self.map.get_column_len() - 1;
-                    y = i;
-                }
-                self.writer(Pixel::new(
-                    Coordinate::new(x as u32, y as u32),
-                    top_bottom,
-                    LetterType::Border,
-                    0,
-                ));
-                i += 1;
-            }
-            j += 1;
-        }
-
-        //left and right border
-        let mut j = 0;
-        while j < 2 {
-            let mut i = 0;
-            while i <= self.map.get_column_len() - 1 {
-                let x;
-                let y;
-                if j < 1 {
-                    x = i;
-                    y = 0;
-                } else {
-                    x = i;
-                    y = self.map.get_row_len() - 1;
-                }
-                self.writer(Pixel::new(
-                    Coordinate::new(x as u32, y as u32),
-                    right_left,
-                    LetterType::Border,
-                    0,
-                ));
-                i += 1;
-            }
-            j += 1;
-        }
-    }
-    fn write_middle_letter(&mut self, letter: char) {
-        self.writer(Pixel::new(
+    fn write_middle_letter(map: Map, letter: char) -> Pixel{
+        Pixel::new(
             Coordinate::new(
-                (self.map.get_column_len() / 2) as u32,
-                (self.map.get_row_len() / 2) as u32,
+                (map.get_column_len() / 2) as u32,
+                (map.get_row_len() / 2) as u32,
             ),
             letter,
             LetterType::Regular,
             0,
-        ));
+        )
     }
 
     pub fn grow(&mut self) {
@@ -238,56 +161,6 @@ impl MapManager {
         match f {
             Some(_) => return None,
             None => return Some(values),
-        }
-    }
-
-    fn writer(&mut self, pixel: Pixel) {
-        self.map.set_pixel(pixel);
-        match pixel.letter_type {
-            LetterType::Border => {
-                self.map.add_to_border(pixel.location);
-            }
-            LetterType::Regular => self.last_written_pos.push(pixel.location),
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::config::Config;
-
-    #[test]
-    fn grow() {
-        let config = Config::new(true, true, true);
-        let mut map_manager = MapManager::new(&config);
-        let dimensions = Dimensions::new(90, 50);
-
-        map_manager.init();
-
-        let middle_letter_pos = Coordinate::new((dimensions.height) / 2, (dimensions.width) / 2);
-
-        if map_manager.map.get_pixel(middle_letter_pos).char == 'A' {
-            println!("correct_middle letter");
-        } else {
-            panic!("middle_letter is not 'A'")
-        }
-
-        let mut i = 0;
-        while i <= 40 {
-            map_manager.grow();
-            i += 1;
-        }
-        for (mut i, letter) in ('A' as u8..='Z' as u8).enumerate() {
-            //initial offset
-            i += 1;
-            let letter_in_map = map_manager.map.get_pixel(Coordinate::new(
-                middle_letter_pos.x,
-                middle_letter_pos.y - i as u32,
-            ));
-            if letter_in_map.char != letter as char {
-                panic!("iterative letter map is broken")
-            }
         }
     }
 }

@@ -1,3 +1,5 @@
+use super::platform::Platform;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RenderConfig {
     // if false, no letters will be printed (' ')
@@ -6,6 +8,7 @@ pub struct RenderConfig {
     pub render_letters: bool,
     // letters or tiles will receive color, or not
     pub colored: bool,
+    pub platform: Platform,
 }
 
 impl RenderConfig {
@@ -13,6 +16,7 @@ impl RenderConfig {
         RenderConfig {
             colored,
             render_letters,
+            platform: Platform::Terminal
         }
     }
 }

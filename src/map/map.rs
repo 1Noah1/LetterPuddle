@@ -1,9 +1,10 @@
-use crate::coordiante::Coordinate;
-use crate::dimensions::Dimensions;
-use crate::letter_type::LetterType;
-use crate::pixel::Pixel;
+use crate::pixel::coordiante::Coordinate;
+use crate::pixel::letter_type::LetterType;
+use crate::pixel::pixel::Pixel;
 
-#[derive(PartialEq, Eq, Debug)]
+use super::dimensions::Dimensions;
+
+#[derive(PartialEq, Eq, Debug,Clone)]
 pub struct Map {
     pub vec: Vec<Vec<Pixel>>,
 }

@@ -1,20 +1,8 @@
 pub mod config;
-pub mod coordiante;
-pub mod dimensions;
-pub mod letter_service;
-pub mod letter_type;
 pub mod map;
-mod map_manager;
 pub mod pixel;
-pub mod render_engine;
-pub mod terminal_render_engine;
-pub mod render_config;
 
-use crate::config::Config;
 use core::time;
-use map_manager::MapManager;
-use render_engine::RenderEngine;
-use terminal_render_engine::TerminalRenderEngine;
 use std::{
     thread::{self},
     time::Instant,

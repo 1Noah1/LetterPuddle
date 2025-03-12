@@ -3,39 +3,40 @@ use std::collections::VecDeque;
 use colored::{Color, Colorize};
 use termion::cursor;
 
-use crate::letter_service::LetterService;
-use crate::map::Map;
-use crate::render_config::RenderConfig;
-use crate::render_engine::RenderEngine;
+use crate::config::render_config::RenderConfig;
+use crate::map::map::Map;
+use crate::services::letter_service::LetterService;
+
+use super::render_engine::RenderEngine;
 
 pub struct TerminalRenderEngine {
     config: RenderConfig,
     frames: VecDeque<Map>,
 }
 
-impl TerminalRenderEngine {
-    pub fn  new(config: RenderConfig) -> TerminalRenderEngine {
+
+
+impl RenderEngine for TerminalRenderEngine {
+    #[allow(refining_impl_trait)]
+    fn  new(config: RenderConfig) -> TerminalRenderEngine {
         TerminalRenderEngine {
             config: config,
             frames: VecDeque::new()
         }
     }
-}
-
-impl RenderEngine for TerminalRenderEngine {
     fn render(&mut self) {
+        let map: Map;
         match self.frames.pop_front() {
-            Some(frame) => let map = frame,
+            Some(frame) => map = frame,
             None => return,
         }
-        let map = self.frames.pop_front();
         map.vec.iter().for_each(|row| {
             row.iter().for_each(|pixel| {
                 cursor::Goto(pixel.location.x as u16, pixel.location.y as u16);
 
-                if config.render_letters {
+                if self.config.render_letters {
                     // print  letters
-                    if config.colored {
+                    if self.config.colored {
                         match LetterService::get_color(pixel.char) {
                             Color::Blue => print!("{}", pixel.char.to_string().blue()),
                             Color::Red => print!("{}", pixel.char.to_string().red()),
@@ -75,10 +76,10 @@ impl RenderEngine for TerminalRenderEngine {
             });
             println!();
         });
-        // delete rendered Frame
+        self.frames.pop_front();
 
     }
-    fn add_frame(&mut self,frame: &Map){
+    fn add_frame(&mut self,frame: Map){
         self.frames.push_back(frame);
     }
 
