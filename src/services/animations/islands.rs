@@ -1,17 +1,51 @@
-use crate::{map::map::Map, pixel::{coordiante::Coordinate, letter_type::LetterType, pixel::Pixel}};
+use crate::{map::map::Map, pixel::{coordiante::Coordinate, letter_type::LetterType, pixel::Pixel}, services::letter_service::LetterService};
 
-use super::grow::Grow;
+use super::{animation_service::AnimationService, grow::Grow, speed::Speed, write::Write};
 
-struct Islands {}
 
-impl Grow for Islands {
-    fn grow(map: &mut Map){
+pub struct Island<'a>{
+    map: &'a mut Map,
+    speed: Speed,
+    generation: u32,
+    last_written_pos: Vec<Coordinate>
+}
 
+
+impl<'a> Write for Island<'a> {}
+
+impl<'a> Grow for Island<'a> {
+    fn grow(&mut self) -> bool{
+        self.generation += 1;
+        if self.last_written_pos.len() > 0 {
+            let mut coords_to_check: Vec<Coordinate> = vec![];
+            self.last_written_pos.iter().for_each(|p| {
+                coords_to_check.push(p.clone());
+            });
+            let mut i = 0;
+            // removing old values
+            while i < self.last_written_pos.len() {
+                self.last_written_pos.remove(i);
+                i += 1
+            }
+            for coord in coords_to_check {
+                self.check_surrounding_letters(coord);
+            }
+        } else {
+            // case should not be hit if innit was performed
+            //self.write_middle_letter('A');
+        }
+
+        true
     }
 }
-impl Islands {
-    fn new() -> Islands{
-        Islands {}
+impl<'a> Island <'a> {
+    pub fn new(map: &'a mut Map, speed: Speed) ->  Island{
+        Island {
+            map,
+            speed,
+            generation: 0,
+            last_written_pos: Vec::new()
+        }
     }
 
 
@@ -55,11 +89,7 @@ impl Islands {
             if let Some(s) = self.for_each_direction(coords, None) {
                 s.iter().for_each(|l| surrounding_letters.push(l.char));
             }
-            let letter = if self.config.iterative_letters {
-                LetterService::get_gen_letter(self.generation)
-            } else {
-                LetterService::get_letter(&surrounding_letters)
-            };
+            let letter = LetterService::get_letter(&surrounding_letters);
             self.writer(Pixel::new(
                 coords,
                 letter,
@@ -67,14 +97,14 @@ impl Islands {
                 self.generation,
             ));
         } else {
-            self.for_each_direction(coords, Some(&MapManager::check_surrounding_letters));
+            self.for_each_direction(coords, Some(&Island::check_surrounding_letters));
         }
     }
 
     fn for_each_direction(
         &mut self,
         coords: Coordinate,
-        f: Option<&dyn Fn(&mut MapManager, Coordinate)>,
+        f: Option<&dyn Fn(&mut Island, Coordinate)>,
     ) -> Option<Vec<Pixel>> {
         let mut offset: i32 = -1;
         let mut i = 0;
@@ -161,6 +191,15 @@ impl Islands {
         match f {
             Some(_) => return None,
             None => return Some(values),
+        }
+    }
+    fn writer(&mut self, pixel: Pixel) {
+        self.map.set_pixel(pixel);
+        match pixel.letter_type {
+            LetterType::Border => {
+                self.map.add_to_border(pixel.location);
+            }
+            LetterType::Regular => self.last_written_pos.push(pixel.location),
         }
     }
 }

@@ -1,6 +1,6 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Animation {
-    Rainbow, 
+    Alphabet, 
     Islands,
     Snakes,
 }

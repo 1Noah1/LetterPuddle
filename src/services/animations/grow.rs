@@ -1,5 +1,9 @@
-use crate::map::map::Map;
+use crate::{config::animation::Animation, map::map::Map};
+
+use super::speed::Speed;
+
 
 pub trait Grow {
-    fn grow(map: &mut Map);
+    // return true if frame has been calculated
+    fn grow(&mut self) -> bool{true}
 }

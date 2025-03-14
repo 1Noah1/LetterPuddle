@@ -1,6 +1,6 @@
 use std::{thread, time::{self, Instant}};
 
-use crate::{config::{animation::{self, Animation}, general_config::GeneralConfig}, map::map_manager::MapManager, render::{render_engine::RenderEngine, terminal_render_engine::TerminalRenderEngine}, services::animations::{grow::Grow, islands}};
+use crate::{config::{animation::{self, Animation}, general_config::GeneralConfig}, map::map_manager::MapManager, render::{render_engine::RenderEngine, terminal_render_engine::TerminalRenderEngine}, services::animations::{alphabet::Alphabet, grow::Grow, islands}};
 
 pub struct AppManager {
 
@@ -10,11 +10,13 @@ impl AppManager {
     pub fn new() -> AppManager{
         AppManager {}
     }
-    pub fn run() {
+    pub fn run(self) {
     let mut i = 0;
     let config = GeneralConfig::config_from_user_preference();
     match config.animation {
-        Animation::Islands => MapManager::new(config, islands)
+        Animation::Alphabet => MapManager::new(config, Alphabet::new())
+        Animation::Islands => MapManager::new(config, Islands::new())
+        Animation::Snakes => MapManager::new(config, Snakes::new())
 
     }
     let mut manager = MapManager::new(&config, );

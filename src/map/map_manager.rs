@@ -5,10 +5,7 @@ use crate::config::general_config::GeneralConfig;
 use crate::pixel::coordiante::Coordinate;
 use crate::pixel::letter_type::LetterType;
 use crate::pixel::pixel::Pixel;
-use crate::render::terminal_render_engine::TerminalRenderEngine;
-use crate::services::animations::grow::{self, Grow};
-use crate::services::letter_service::LetterService;
-
+use crate::services::animations::grow::Grow;
 use super::dimensions::Dimensions;
 use super::map::Map;
 
