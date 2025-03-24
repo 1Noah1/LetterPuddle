@@ -1,5 +1,5 @@
-use std::io::stdin;
 use crate::config::render_config::RenderConfig;
+use std::io::stdin;
 
 use super::animation::Animation;
 
@@ -38,7 +38,7 @@ impl GeneralConfig {
             Ok(_) => match buf.trim().parse::<i32>() {
                 Ok(num) => match num {
                     001 => config.animation = Animation::Islands,
-                    002 => config.animation = Animation::Rainbow,
+                    002 => config.animation = Animation::Alphabet,
                     003 => config.animation = Animation::Snakes,
                     _ => println!(
                         "invalid input: {}, will proceed with standard option",
@@ -105,7 +105,9 @@ mod tests {
     // it's needed for the test idk why linter calls it uknown
     #![allow(unused_imports)]
 
-    use crate::config::{animation::Animation, general_config::GeneralConfig, render_config::RenderConfig};
+    use crate::config::{
+        animation::Animation, general_config::GeneralConfig, render_config::RenderConfig,
+    };
 
     #[test]
     fn new_std() {

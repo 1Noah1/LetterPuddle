@@ -1,7 +1,22 @@
+use core::panic;
+
+use crate::map::{map::Map, map_stats::MapStats};
+
+use super::animation_traits::{Grow, Write};
+
 pub struct Alphabet {}
 
-impl Alphabet {
+impl Write for Alphabet {}
+
+impl<'a> Alphabet {
     pub fn new() -> Alphabet {
-        Alphabet{}
+        Alphabet {}
+    }
+}
+
+impl Grow for Alphabet {
+    #[warn(unused_variables)]
+    fn grow(&self, map: &mut Map, map_stats: &mut MapStats) {
+        panic!("this animation is not implemented yet")
     }
 }

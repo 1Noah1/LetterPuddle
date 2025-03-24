@@ -1,48 +1,48 @@
-use std::{thread, time::{self, Instant}};
+use crate::{
+    config::{animation::Animation, general_config::GeneralConfig, platform::Platform},
+    map::{map::Map, map_manager::MapManager},
+    render::{render_engine::RenderEngine, terminal_render_engine::TerminalRenderEngine},
+    services::{
+        animations::{alphabet::Alphabet, islands::Island, snakes::Snakes},
+        dimensions_service::DimensionsService,
+    },
+};
 
-use crate::{config::{animation::{self, Animation}, general_config::GeneralConfig}, map::map_manager::MapManager, render::{render_engine::RenderEngine, terminal_render_engine::TerminalRenderEngine}, services::animations::{alphabet::Alphabet, grow::Grow, islands}};
-
-pub struct AppManager {
-
-}
+pub struct AppManager {}
 
 impl AppManager {
-    pub fn new() -> AppManager{
+    pub fn new() -> AppManager {
         AppManager {}
     }
     pub fn run(self) {
-    let mut i = 0;
-    let config = GeneralConfig::config_from_user_preference();
-    match config.animation {
-        Animation::Alphabet => MapManager::new(config, Alphabet::new())
-        Animation::Islands => MapManager::new(config, Islands::new())
-        Animation::Snakes => MapManager::new(config, Snakes::new())
+        let config = GeneralConfig::config_from_user_preference();
+        let map = Map::new(DimensionsService::get_dimensions());
 
-    }
-    let mut manager = MapManager::new(&config, );
-    let mut engine = TerminalRenderEngine::new(config.render_config,);
+        let mut manager: MapManager = match config.animation {
+            Animation::Alphabet => MapManager::new(map, Box::new(Alphabet::new())),
+            Animation::Islands => MapManager::new(map, Box::new(Island::new())),
+            Animation::Snakes => MapManager::new(map, Box::new(Snakes::new())),
+        };
 
-    MapManager::init(&mut manager);
-    let start = Instant::now();
+        let mut engine = match config.render_config.platform {
+            Platform::Terminal => TerminalRenderEngine::new(config.render_config),
+        };
+        manager.run();
 
-    loop {
-        let start = Instant::now();
-        engine.render();
-        // TerminalRenderEngine::render(&config.render_config, &mut manager.map);
-
-        manager.grow();
-        thread::sleep(time::Duration::from_millis(50));
-        engine.add_frame(manager.map.clone());
-
-        let end = Instant::now();
-        println!("time: {:?}", end.duration_since(start));
-        if i == 68 {
-            break;
+        // calculation thread
+        let mut i = 0;
+        loop {
+            manager.run();
+            engine.add_frame(manager.map.clone());
+            if i == 68 {
+                break;
+            }
+            i += 1;
         }
-        i += 1;
-    }
 
-    let end = Instant::now();
-    print!("total_time: {:?}", end.duration_since(start));
+        // render thread
+        while engine.frames_left() {
+            engine.render();
+        }
     }
 }

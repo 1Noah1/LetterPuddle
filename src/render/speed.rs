@@ -1,4 +1,4 @@
-pub enum Speed  {
+pub enum Speed {
     // timeout in ms
     Low = 150,
     Medium = 50,

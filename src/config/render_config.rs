@@ -16,7 +16,7 @@ impl RenderConfig {
         RenderConfig {
             colored,
             render_letters,
-            platform: Platform::Terminal
+            platform: Platform::Terminal,
         }
     }
 }

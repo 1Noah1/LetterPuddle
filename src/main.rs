@@ -1,9 +1,9 @@
+pub mod app_manager;
 pub mod config;
 pub mod map;
 pub mod pixel;
 pub mod render;
 pub mod services;
-pub mod app_manager;
 
 use core::time;
 use std::{

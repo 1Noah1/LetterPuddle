@@ -14,15 +14,16 @@ pub struct TerminalRenderEngine {
     frames: VecDeque<Map>,
 }
 
-
-
 impl RenderEngine for TerminalRenderEngine {
     #[allow(refining_impl_trait)]
-    fn  new(config: RenderConfig) -> TerminalRenderEngine {
+    fn new(config: RenderConfig) -> TerminalRenderEngine {
         TerminalRenderEngine {
             config: config,
-            frames: VecDeque::new()
+            frames: VecDeque::new(),
         }
+    }
+    fn frames_left(&self) -> bool {
+        !self.frames.is_empty()
     }
     fn render(&mut self) {
         let map: Map;
@@ -77,10 +78,8 @@ impl RenderEngine for TerminalRenderEngine {
             println!();
         });
         self.frames.pop_front();
-
     }
-    fn add_frame(&mut self,frame: Map){
+    fn add_frame(&mut self, frame: Map) {
         self.frames.push_back(frame);
     }
-
 }
