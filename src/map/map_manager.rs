@@ -1,7 +1,6 @@
 use super::dimensions::Dimensions;
 use super::map::Map;
-use super::map_stats::{self, MapStats};
-use crate::config::general_config::GeneralConfig;
+use super::map_stats::MapStats;
 use crate::services::animations::animation_traits::{Grow, Write};
 
 pub struct MapManager {
@@ -12,7 +11,7 @@ pub struct MapManager {
 impl Write for MapManager {}
 
 impl MapManager {
-    pub fn new(map: Map, svc: Box<dyn Grow>) -> MapManager {
+    pub fn new(map: Map, svc: Box<dyn Grow + Send>) -> MapManager {
         //terminal dimension can be obtained through running termion::terminal_size()
         let terminal_dimensions = Dimensions {
             // if dimensions dont fit the screen the lines will overflow into the next one (graphic bug)
@@ -20,13 +19,13 @@ impl MapManager {
             height: 50,
         };
         Self {
-            map: map,
+            map,
             map_stats: MapStats::new(),
             animation_svc: svc,
         }
     }
 
-    pub fn run(&mut self) {
+    pub fn run_animation(&mut self) {
         self.map_stats.generation += 1;
         self.animation_svc.grow(&mut self.map, &mut self.map_stats);
     }

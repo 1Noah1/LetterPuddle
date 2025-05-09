@@ -7,6 +7,7 @@ use crate::{
         dimensions_service::DimensionsService,
     },
 };
+use std::{thread, time::{Duration, Instant}};
 
 pub struct AppManager {}
 
@@ -27,12 +28,14 @@ impl AppManager {
         let mut engine = match config.render_config.platform {
             Platform::Terminal => TerminalRenderEngine::new(config.render_config),
         };
-        manager.run();
 
         // calculation thread
         let mut i = 0;
         loop {
-            manager.run();
+            let start = Instant::now();
+            manager.run_animation();
+            let elapsed = start.elapsed();
+            println!("calculation done: {:?}", elapsed);
             engine.add_frame(manager.map.clone());
             if i == 68 {
                 break;
@@ -40,9 +43,13 @@ impl AppManager {
             i += 1;
         }
 
+
+        let mut i = 0;
         // render thread
         while engine.frames_left() {
             engine.render();
+            print!("render done: {i}");
+            i += 1;
         }
     }
 }

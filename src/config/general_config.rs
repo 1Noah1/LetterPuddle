@@ -54,6 +54,7 @@ impl GeneralConfig {
         println!("do you want to render letters or colored tiles?");
         println!("1 for letters");
         println!("2 for tiles (recommended)");
+        buf.clear();
         match stdin().read_line(&mut buf) {
             Ok(_) => match buf.trim().parse::<i32>() {
                 Ok(num) => match num {

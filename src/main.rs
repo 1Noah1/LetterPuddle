@@ -5,11 +5,6 @@ pub mod pixel;
 pub mod render;
 pub mod services;
 
-use core::time;
-use std::{
-    thread::{self},
-    time::Instant,
-};
 
 use app_manager::AppManager;
 

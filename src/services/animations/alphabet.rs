@@ -8,14 +8,13 @@ pub struct Alphabet {}
 
 impl Write for Alphabet {}
 
-impl<'a> Alphabet {
+impl Alphabet {
     pub fn new() -> Alphabet {
         Alphabet {}
     }
 }
 
 impl Grow for Alphabet {
-    #[warn(unused_variables)]
     fn grow(&self, map: &mut Map, map_stats: &mut MapStats) {
         panic!("this animation is not implemented yet")
     }

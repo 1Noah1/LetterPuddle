@@ -27,8 +27,12 @@ impl Grow for Island {
                 self.check_surrounding_letters(map, map_stats, &coord);
             }
         } else {
-            // case should not be hit if innit was performed
-            //self.write_middle_letter('A');
+            self.write_borders(map);
+            self.write(
+                map,
+                Some(&mut map_stats.last_written_pos),
+                self.get_middle_letter(map, 'A'),
+            );
         }
     }
 }
@@ -36,7 +40,7 @@ impl Island {
     pub fn new() -> Island {
         Island {}
     }
-    fn write_middle_letter(map: Map, letter: char) -> Pixel {
+    fn get_middle_letter(&self, map: &Map, letter: char) -> Pixel {
         Pixel::new(
             Coordinate::new(
                 (map.get_column_len() / 2) as u32,
@@ -72,7 +76,7 @@ impl Island {
     }
     */
 
-    pub fn check_surrounding_letters(
+    fn check_surrounding_letters(
         &self,
         map: &mut Map,
         map_stats: &mut MapStats,
@@ -87,7 +91,7 @@ impl Island {
             Island::write(
                 &self,
                 map,
-                &mut map_stats.last_written_pos,
+                Some(&mut map_stats.last_written_pos),
                 Pixel::new(*coords, letter, LetterType::Regular, map_stats.generation),
             );
         } else {

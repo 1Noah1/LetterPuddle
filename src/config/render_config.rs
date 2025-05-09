@@ -1,3 +1,5 @@
+use crate::render::speed::Speed;
+
 use super::platform::Platform;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -9,6 +11,7 @@ pub struct RenderConfig {
     // letters or tiles will receive color, or not
     pub colored: bool,
     pub platform: Platform,
+    pub speed: Speed,
 }
 
 impl RenderConfig {
@@ -17,6 +20,7 @@ impl RenderConfig {
             colored,
             render_letters,
             platform: Platform::Terminal,
+            speed: Speed::Medium,
         }
     }
 }

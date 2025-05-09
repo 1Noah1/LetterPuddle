@@ -24,19 +24,23 @@ impl Snakes {
     }
 
     fn slither(&self, map: &mut Map, map_stats: &mut MapStats) {
-        let center = Coordinate::new(map.get_column_len() as u32, map.get_row_len() as u32);
-
+        let center = Coordinate::new(
+            ((map.get_column_len() - 1) / 2) as u32,
+            ((map.get_row_len() - 1) / 2) as u32,
+        );
         let mut new_pixels: Vec<Pixel> = vec![];
+
         // check if snake is too close to center
         for pos in &map_stats.last_written_pos {
             if pos.y == center.y - 1 || pos.y == center.y + 1 {
                 continue;
             }
+
             let shift: i32;
-            if pos.y > map.get_row_len() as u32 {
-                shift = 1
-            } else {
+            if pos.y > (map.get_row_len() / 2) as u32 {
                 shift = -1
+            } else {
+                shift = 1
             }
 
             new_pixels.push(Pixel::new(
@@ -46,19 +50,23 @@ impl Snakes {
                 map_stats.generation,
             ));
         }
+
         for pixel in new_pixels {
-            self.write(map, &mut map_stats.last_written_pos, pixel);
+            self.write(map, Some(&mut map_stats.last_written_pos), pixel);
         }
     }
 
     fn first_step(&self, map: &mut Map, map_stats: &mut MapStats) {
-        let pos_one = Coordinate::new((map.get_column_len() / 2) as u32, 0);
-        let pos_two = Coordinate::new((map.get_column_len() / 2) as u32, map.get_row_len() as u32);
+        let pos_one = Coordinate::new(((map.get_column_len() - 1) / 2) as u32, 0);
+        let pos_two = Coordinate::new(
+            ((map.get_column_len() - 1) / 2) as u32,
+            (map.get_row_len() - 1) as u32,
+        );
 
         let snake_one = Pixel::new(pos_one, 'A', LetterType::Regular, 0);
         let snake_two = Pixel::new(pos_two, 'B', LetterType::Regular, 0);
 
-        self.write(map, &mut map_stats.last_written_pos, snake_one);
-        self.write(map, &mut map_stats.last_written_pos, snake_two);
+        self.write(map, Some(&mut map_stats.last_written_pos), snake_one);
+        self.write(map, Some(&mut map_stats.last_written_pos), snake_two);
     }
 }
