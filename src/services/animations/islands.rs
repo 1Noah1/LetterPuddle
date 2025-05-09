@@ -143,8 +143,6 @@ impl Island {
                             }
                         }
                         None => values.push(
-                            // i think i should use references instead
-                            // but that causes a weird error i dont understand yet
                             map.get_pixel(&Coordinate::new(
                                 (coords.x as i32 + offset) as u32,
                                 coords.y,
