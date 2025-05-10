@@ -5,7 +5,7 @@ pub struct Coordinate {
 }
 impl Coordinate {
     pub fn new(x: u32, y: u32) -> Coordinate {
-        Coordinate { x: x, y: y }
+        Coordinate { x, y }
     }
 }
 

@@ -1,4 +1,5 @@
-use crate::{coordiante::Coordinate, letter_type::LetterType};
+use super::coordiante::Coordinate;
+use super::letter_type::LetterType;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Pixel {

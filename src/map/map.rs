@@ -1,9 +1,10 @@
-use crate::coordiante::Coordinate;
-use crate::dimensions::Dimensions;
-use crate::letter_type::LetterType;
-use crate::pixel::Pixel;
+use crate::pixel::coordiante::Coordinate;
+use crate::pixel::letter_type::LetterType;
+use crate::pixel::pixel::Pixel;
 
-#[derive(PartialEq, Eq, Debug)]
+use super::dimensions::Dimensions;
+
+#[derive(PartialEq, Eq, Debug, Clone)]
 pub struct Map {
     pub vec: Vec<Vec<Pixel>>,
 }
@@ -42,7 +43,10 @@ impl Map {
     pub fn get_column_len(&self) -> usize {
         self.vec.len()
     }
-    pub fn get_pixel(&self, location: Coordinate) -> &Pixel {
+    pub fn get_pixel(&self, location: &Coordinate) -> Pixel {
+        self.vec[location.x as usize][location.y as usize]
+    }
+    pub fn get_ref_pixel(&self, location: &Coordinate) -> &Pixel {
         &self.vec[location.x as usize][location.y as usize]
     }
     fn get_mut_pixel(&mut self, location: Coordinate) -> &mut Pixel {
@@ -52,7 +56,7 @@ impl Map {
         self.vec[new_pixel.location.x as usize][new_pixel.location.y as usize] = new_pixel
     }
     pub fn is_border_pos(&self, location: Coordinate) -> bool {
-        match self.get_pixel(location).letter_type {
+        match self.get_pixel(&location).letter_type {
             LetterType::Border => true,
             LetterType::Regular => false,
         }
@@ -131,7 +135,10 @@ mod tests {
         };
         let map = Map::new(dimensions);
 
-        assert_eq!(map.get_pixel(Coordinate { x: 10, y: 10 }), &map.vec[10][10]);
+        assert_eq!(
+            map.get_ref_pixel(&Coordinate { x: 10, y: 10 }),
+            &map.vec[10][10]
+        );
     }
 
     #[test]
@@ -146,7 +153,7 @@ mod tests {
         let pixel = Pixel::new(new_pixel_pos, 'A', LetterType::Regular, 1000);
 
         map.set_pixel(pixel);
-        assert_eq!(map.get_pixel(new_pixel_pos), &pixel)
+        assert_eq!(map.get_ref_pixel(&new_pixel_pos), &pixel)
     }
 
     #[test]
